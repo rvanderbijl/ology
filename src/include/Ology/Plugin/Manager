@@ -1,1 +1,1 @@
-../../../lib/Plugin/Manager.h
+#include "../../../lib/Plugin/Manager.h"

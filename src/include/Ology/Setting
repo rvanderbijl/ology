@@ -1,1 +1,1 @@
-../../lib/Setting.h
+#include "../../lib/Setting.h"

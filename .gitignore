@@ -3,4 +3,5 @@ src/build
 Makefile
 *.so
 *.so.*
-src/ology
+src/ology*
+*.pro.user

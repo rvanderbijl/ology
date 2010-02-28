@@ -1,5 +1,9 @@
 #include <QDebug>
 #include <QPluginLoader>
+#include <QLibrary>
+#include <QDir>
+#include <QFileInfo>
+
 #include "ManagerInterface.h"
 #include "Manager.h"
 #include "InfoInterface.h"
@@ -11,6 +15,19 @@ namespace Plugin {
 Manager::Manager(QObject *parent) :
     QObject(parent)
 {
+}
+
+void Manager::autoLoadPlugins( Ology::InitializePurpose purpose ) {
+    QStringList files;
+
+    QDir dir(pluginSearchDirectory());
+    foreach(QFileInfo fi, dir.entryInfoList(QDir::Files|QDir::Executable)) {
+        if (QLibrary::isLibrary(fi.fileName())) {
+            files << fi.fileName();
+        }
+    }
+
+    loadPlugins(purpose, files);
 }
 
 void Manager::loadPlugins(Ology::InitializePurpose purpose, const QStringList &pluginNames) {
@@ -56,7 +73,33 @@ void Manager::loadPlugins(Ology::InitializePurpose purpose, const QStringList &p
     }
 }
 
-QList<Plugin::InfoInterface*> Manager::ologyPlugins() {
+void Manager::unloadPlugin(InfoInterface *plugin) {
+    foreach(QPluginLoader* loader, _plugins) {
+        Plugin::InfoInterface* ii = qobject_cast<Plugin::InfoInterface*>(loader->instance());
+        if (ii == plugin) {
+            loader->unload();
+            QHash<QString, QPluginLoader*>::key_type key;
+            foreach(key, _screenFactory.keys(loader)) {
+                _screenFactory.remove(key);
+            }
+            _plugins.removeAll(loader);
+            delete loader;
+            loader = NULL;
+            return;
+        }
+    }
+}
+void Manager::unloadPlugins() {
+    foreach(QPluginLoader* loader, _plugins) {
+        loader->unload();
+        delete loader;
+        loader = NULL;
+    }
+    _screenFactory.clear();
+    _plugins.clear();
+}
+
+QList<Plugin::InfoInterface*> Manager::ologyPlugins() const {
     QList<Plugin::InfoInterface*> list;
     foreach(QPluginLoader* loader, _plugins) {
         Plugin::InfoInterface* ii = qobject_cast<Plugin::InfoInterface*>(loader->instance());
@@ -64,7 +107,7 @@ QList<Plugin::InfoInterface*> Manager::ologyPlugins() {
     }
     return list;
 }
-QList<ScreenInterface*> Manager::screenPlugins() {
+QList<ScreenInterface*> Manager::screenPlugins() const {
     QList<Plugin::ScreenInterface*> list;
     foreach(QPluginLoader* loader, _plugins) {
         Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());

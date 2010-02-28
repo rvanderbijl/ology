@@ -3,6 +3,7 @@
 #include "ManagerInterface.h"
 
 namespace Ology {
+namespace Core {
 
 DisplayScreenAction::DisplayScreenAction(QObject *parent) :
     AbstractAction(parent)
@@ -13,7 +14,7 @@ DisplayScreenAction::DisplayScreenAction(const QString &screenId, QObject *paren
     AbstractAction(parent),
     _screenId(screenId)
 {
-    setText("Display Screen: " + screenId);
+    setText(tr("Display Screen: %1").arg(screenId));
 }
 
 void DisplayScreenAction::run() {
@@ -26,4 +27,4 @@ void DisplayScreenAction::run() {
     OLOGY()->displayScreen(screenId());
 }
 
-}
+}}

@@ -16,7 +16,8 @@ class Manager : public QApplication, public ManagerInterface {
 public:
     Manager(int &argc, char**argv);
     
-    virtual QWidget* screenParent()  { return &_window; }
+    virtual Plugin::Manager* pluginManager() const { return const_cast<Plugin::Manager*>(&_pluginManager); }
+    virtual QWidget* screenParent() const { return const_cast<Window*>(&_window); }
     virtual void displayScreen(const QString &id);
     virtual void closeCurrentScreen();
    

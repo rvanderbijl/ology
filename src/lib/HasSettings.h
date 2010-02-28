@@ -13,6 +13,7 @@ public:
 
 protected:
     void setSettings(const QList<AbstractSetting*> &list) { _settings = list; }
+    void registerSetting(AbstractSetting* setting) { _settings.append(setting); }
 
 private:
     QList<AbstractSetting*> _settings;

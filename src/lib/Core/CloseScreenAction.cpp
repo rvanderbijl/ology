@@ -3,11 +3,12 @@
 #include "ManagerInterface.h"
 
 namespace Ology {
+namespace Core {
 
 CloseScreenAction::CloseScreenAction(QObject *parent) :
     AbstractAction(parent)
 {
-    setText("Close screen");
+    setText(tr("Close screen"));
 }
 
 void CloseScreenAction::run() {
@@ -15,4 +16,4 @@ void CloseScreenAction::run() {
     OLOGY()->closeCurrentScreen();
 }
 
-}
+}}

@@ -2,4 +2,5 @@ CONFIG += ordered
 
 TEMPLATE=subdirs
 
-SUBDIRS += lib frontend plugins/menus
+SUBDIRS += lib frontend settings
+SUBDIRS += plugins/menus

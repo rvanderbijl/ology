@@ -1,5 +1,5 @@
 #include <Ology/AbstractScreen>
-#include <Ology/CloseScreenAction>
+#include <Ology/Core/CloseScreenAction>
 
 #include <QStringList>
 #include <QDebug>
@@ -11,11 +11,13 @@ namespace Ology {
 Manager::Manager(int &argc, char** argv) :
     QApplication(argc, argv)
 {
+    setOrganizationName("ology.org");
+    setApplicationName("ology");
     addLibraryPath(".");
     _pluginManager.loadPlugins( Ology::RealUsage, QStringList() << "libmenus.so" );
 
 
-    QAction *action = new CloseScreenAction(&_window);
+    QAction *action = new Core::CloseScreenAction(&_window);
     action->setShortcut(Qt::Key_Escape);
     _window.addAction(action);
 

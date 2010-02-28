@@ -1,1 +1,1 @@
-../../lib/HasErrorString.h
+#include "../../lib/HasErrorString.h"

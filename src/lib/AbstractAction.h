@@ -2,10 +2,11 @@
 #define OLOGY_ACTION
 
 #include <QAction>
+#include <Ology/HasSettings>
 
 namespace Ology {
 
-class AbstractAction : public QAction {
+class AbstractAction : public QAction, public HasSettings {
     Q_OBJECT
     Q_PROPERTY(Ology::AbstractAction::Type type READ type)
     Q_ENUMS(Type)

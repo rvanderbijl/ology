@@ -1,6 +1,3 @@
-#include <Ology/AbstractScreen>
-#include <Ology/CloseScreenAction>
-
 #include <QStringList>
 #include <QDebug>
 

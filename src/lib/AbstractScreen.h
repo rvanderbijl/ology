@@ -5,11 +5,12 @@
 #include <QMetaType>
 #include <Ology/HasErrorString>
 #include <Ology/InitializePurpose>
+#include <Ology/HasSettings>
 
 namespace Ology {
     class AbstractAction;
 
-class AbstractScreen : public QWidget, public HasErrorString {
+class AbstractScreen : public QWidget, public HasSettings, public HasErrorString {
     Q_OBJECT
 public:
     enum MusicUsage { MergeSound, GrabSound };

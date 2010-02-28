@@ -1,5 +1,5 @@
 #include <Ology/AbstractScreen>
-#include <Ology/CloseScreenAction>
+#include <Ology/AbstractAction>
 #include <Ology/InitializePurpose>
 #include <Ology/Plugin/InfoInterface>
 #include <Ology/Plugin/ScreenInterface>

@@ -1,1 +1,1 @@
-../../../lib/Plugin/InfoInterface.h
+#include "../../../lib/Plugin/InfoInterface.h"

@@ -4,6 +4,7 @@
 #include <Ology/AbstractAction>
 
 namespace Ology {
+namespace Core {
 
 class DisplayScreenAction : public AbstractAction {
     Q_OBJECT
@@ -23,6 +24,6 @@ private:
     QString _screenId;
 };
 
-}
+}}
 
 #endif

@@ -1,7 +1,7 @@
 #include <QtPlugin>
 #include "Interface.h"
 #include "MenuScreen.h"
-#include <Ology/DisplayScreenAction>
+#include <Ology/Core/DisplayScreenAction>
 
 namespace Ology {
 namespace Plugin {
@@ -30,28 +30,28 @@ AbstractScreen* Interface::createScreen(const QString &id, QWidget *parent) {
 
     if (id == "menu-main") {
         screen->setMenuActions( QList<AbstractAction*>() 
-                                    << new DisplayScreenAction("menu-listen", screen)
-                                    << new DisplayScreenAction("menu-watch", screen)
-                                    << new DisplayScreenAction("menu-play", screen)
+                                    << new Core::DisplayScreenAction("menu-listen", screen)
+                                    << new Core::DisplayScreenAction("menu-watch", screen)
+                                    << new Core::DisplayScreenAction("menu-play", screen)
                             );
     } else if (id == "menu-listen") {
         screen->setMenuActions( QList<AbstractAction*>() 
-                                << new DisplayScreenAction("music-currently-playing", screen)
-                                << new DisplayScreenAction("music-select-playlist", screen)
-                                << new DisplayScreenAction("music-manager-playlists", screen)
+                                << new Core::DisplayScreenAction("music-currently-playing", screen)
+                                << new Core::DisplayScreenAction("music-select-playlist", screen)
+                                << new Core::DisplayScreenAction("music-manager-playlists", screen)
                             );
     } else if (id == "menu-watch") {
         screen->setMenuActions( QList<AbstractAction*>() 
-                                << new DisplayScreenAction("watch-tv", screen)
-                                << new DisplayScreenAction("watch-videos", this)
-                                << new DisplayScreenAction("watch-movie-trailers", screen)
+                                << new Core::DisplayScreenAction("watch-tv", screen)
+                                << new Core::DisplayScreenAction("watch-videos", this)
+                                << new Core::DisplayScreenAction("watch-movie-trailers", screen)
                             );
     } else if (id == "menu-play") {
         screen->setMenuActions( QList<AbstractAction*>() 
-                                << new DisplayScreenAction("menu-listen", screen)
-                                << new DisplayScreenAction("menu-watch", screen)
-                                << new DisplayScreenAction("games", screen)
-                                << new DisplayScreenAction("with-yourself", screen)
+                                << new Core::DisplayScreenAction("menu-listen", screen)
+                                << new Core::DisplayScreenAction("menu-watch", screen)
+                                << new Core::DisplayScreenAction("games", screen)
+                                << new Core::DisplayScreenAction("with-yourself", screen)
                             );
     } else {
         setErrorString(tr("Unknown menu id: %1").arg(id));

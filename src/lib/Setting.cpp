@@ -16,4 +16,15 @@ void AbstractSetting::setVariantValue(const QVariant &value) {
     settings.setValue(path, value);
 }
 
+QString AbstractSetting::displayValue() const {
+    QString display = variantValue().toString();
+    if (!display.isEmpty()) { return display; }
+
+    // TODO
+    /*
+    QByteArray data;
+    QDataStream ds(data);
+    */
+}
+
 }

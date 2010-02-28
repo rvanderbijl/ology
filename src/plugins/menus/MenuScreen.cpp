@@ -20,6 +20,7 @@ QList<AbstractAction*> MenuScreen::actions() const {
 }
 
 bool MenuScreen::initialize(Ology::InitializePurpose initPurpose) {
+    Q_UNUSED(initPurpose);
     setupUi(this);
 
     QBoxLayout *layout = qobject_cast<QBoxLayout*>(_groupBox->layout());
