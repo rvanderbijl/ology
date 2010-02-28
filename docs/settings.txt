@@ -1,0 +1,21 @@
+
+Ology application settings:
+- plugin/auto-load: bool
+- plugin/search-directory: QString
+- plugin/plugins: QStringList
+
+
+- first-screen-id
+- close-first-screen behaviour: enum { Ignore, Quit, ConfirmQuit }
+- default-language
+
+
+AbsractActions:
+- shortcut(1..4)
+- confirm-action: enum { Quit, ConfirmQuit }
+
+
+AbstractScreen:
+- each action
+- image (for menus)
+
