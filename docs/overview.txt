@@ -1,0 +1,145 @@
+Ology is a media center.
+
+Created b/c of dislike of MyhTV. Some of MythTV's problems:
+- no simple menu editor
+- database is used 
+- lot of focus on tv/pvr functionality
+- can't control music when not in the music screen
+- setup screens suck
+- stupid having to tell it to scan for new media
+
+Ology:
+- Aims to be plugin based
+- Simple configuration files
+
+Three Main concepts:
+- Screen
+- Action
+- Input
+
+A screen is what is displayed. Examples of screens:
+- Menu screen(s)
+- Game screen
+- Video selection screen
+- video-play screen
+
+A action is something that Ology can do.  E.g.:
+- Play-music, Pause-music, Stop-music
+- Display Screen (X)
+- Cursor-movements, "Ok"/"Enter"
+Some actions, like "Display Screen" can take parameters
+
+An input is the way the user selects/invokes actions. E.g.
+- Remote control
+- Keyboard
+
+
+The interaction between screens, actions, and input is interesting:
+- Some screens (e.g. game screens) may wish to have raw access to the input
+- Some actions only work when a certain screen is active
+
+
+Screens have the following attributs:
+- Name: QString: the name of this screen
+- Description: QString: the description of this screen
+- SoundUsage: enum { MergeSound, GrabSound }
+    - MergeSound: any sound played by this screen should be merged with any other sound 
+      being produced by the system
+    - GrabSound: any sound played by ology should be paused when entering this screen
+- InputUsage: enum { Normal, ScreenOnly, Strict }
+    - Normal: any actions provided by the screen or any of the "global" actions may be run
+    - ScreenOnly: typically only commmands provided by the screen can be run. 
+                  Overrides global action inputs.  Only actionss with a high-priority can be invoked 
+                  (e.g. this allows the power buttons to work, but screen get all other inputs)
+    - Strict: only actions provided by the screen can be run. 
+      Even high-priority global actions aren't run
+- State { Running, Suspended }
+    - Running: currently displayed/in-use
+    - Suspended: a child-screen is being displayed
+- Actions { a list of actions specific to this screen }
+- Settings { a list of settings that this screen supports }
+
+
+
+Actions:
+- Type { ScreenSpecific, Global, HighPriority }
+- QList<Input>
+
+
+
+An input can be:
+- can be multi-key (CTRL+P)
+- sequence of keys (CTRL-X,CTRL-S)
+- a Action (e.g. if an action is invoked, then this input is also invoked)
+  (useful for having a generic action, like "left" or "right" which may not have common inputs)
+
+
+
+
+Screen life-time:
+- Screens can be created for usage, or for intraspection
+- When a screen is requested, a new instance of that screen is created. 
+- If any of its actions start a new screen, this screen is kept "suspended" until the child-screen is closed
+- A child screen can be created if a global-input starts a "display-screen" as well: 
+    - allows for: playing a game,
+                  global-input starts a action to go to playlist-selection screen
+                  going back to game from the playlist-selection screen
+
+
+Plugins:
+- can be created for usage, or for intraspection
+- provides a list of possible screens names
+- provides a list of global actions (instances)
+- a factory for creating screens
+- differnet interfaces:
+    ScreenInterface
+    SoundInterface
+    ThemeInterface
+
+
+
+
+TODO: themes
+TODO: create version object? plugin-interdependencies?
+TODO: standardize settings file
+TODO: disable-screen-saver per screen
+TODO: mutli display settings/support
+
+
+
+Ology Settings:
+- default screen name
+- screen-size: full, or width/height
+
+
+Plugins:
+- lirc-input
+- keyboard-input
+- menus
+- power { global-actions: toggle-display-power, suspend-computer }
+- language { global-actions: language-select(x) for each language we have translations for,
+             screens: language-select: allow user to select language from a list }
+- music { 
+    global-actions:
+        - music-play
+        - music-toggle-pause
+        - music-next
+        - music-prev
+        - music-ffwd
+        - music-rewind
+        - music-select-playlist(x)
+    screens:
+        - music-select-playlist (choose what playlist to play)
+        - music-modify-playlist (add/remove songs from a playlist)
+        - music-whats-playing (view what is currently playing)
+}
+- video-player {
+}
+- video-selector {
+    global-actions:
+        - video-play
+}
+
+
+
+
