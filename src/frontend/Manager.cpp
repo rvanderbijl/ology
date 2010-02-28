@@ -12,7 +12,7 @@ Manager::Manager(int &argc, char** argv) :
     QApplication(argc, argv)
 {
     addLibraryPath(".");
-    _pluginManager.loadPlugins( QStringList() << "libmenus.so" );
+    _pluginManager.loadPlugins( Ology::RealUsage, QStringList() << "libmenus.so" );
 
 
     QAction *action = new CloseScreenAction(&_window);
@@ -39,7 +39,7 @@ void Manager::displayScreen(const QString &id) {
     }
 
     // Screen->initialize call recursively call displayScreen.
-    if (!screen->initialize()) {
+    if (!screen->initialize(Ology::RealUsage)) {
         // TODO: display warning to user
         //       or if another screen has been display, be quiet?
         qWarning() << "Screen failed to initialize:" << screen->id();

@@ -5,27 +5,31 @@
 #include <QStringList>
 #include <QHash>
 
+#include <Ology/InitializePurpose>
+
 class QPluginLoader;
 
 namespace Ology {
     class AbstractScreen;
 
 namespace Plugin {
-    class Interface;
+    class InfoInterface;
+    class ScreenInterface;
 
 class Manager : public QObject {
 public:
     Manager(QObject *parent = 0);
 
-    void loadPlugins(const QStringList &pluginNames);
-    QList<Interface*> ologyPlugins();
+    void loadPlugins(Ology::InitializePurpose purpose, const QStringList &pluginNames);
 
+    QList<InfoInterface*>   ologyPlugins();
+    QList<ScreenInterface*> screenPlugins();
 
     AbstractScreen* createScreen(const QString &id);
 
 private:
      QList<QPluginLoader*> _plugins;
-     QHash<QString, Interface*> _screenFactory;
+     QHash<QString, QObject*> _screenFactory;
 };
 
 

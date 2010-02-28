@@ -20,7 +20,7 @@ public:
     virtual QString description() const { return "Desc:" + _screenId; }
 
     virtual QList<AbstractAction*> actions() const;
-    virtual bool initialize();
+    virtual bool initialize(Ology::InitializePurpose initPurpose);
     
 private:
     QString _screenId;

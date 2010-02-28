@@ -1,5 +1,5 @@
-#ifndef OLOGY_PLUGIN_INTERFACE
-#define OLOGY_PLUGIN_INTERFACE
+#ifndef OLOGY_PLUGIN_SCREEN_INTERFACE
+#define OLOGY_PLUGIN_SCREEN_INTERFACE
 
 #include <QStringList>
 #include <Ology/HasErrorString>
@@ -12,19 +12,8 @@ namespace Ology {
 
 namespace Plugin {
 
-class Interface : public HasErrorString {
+class ScreenInterface {
 public:
-    virtual QString name() const = 0;
-    virtual QString version() const = 0;
-    virtual QString description() const = 0;
-
-    /*! initialize is automatically called after the plugin has been loaded.
-     *
-     * Implementations should load their settings. No screens or actions from
-     * this plugin will be used until initialize() returns true.
-     */
-    virtual bool initialize() = 0;
-
     /*! screenNames returns the list of possible screen IDs.
      *
      * This list may be empty if the plugin doesn't provide any screens.
@@ -52,6 +41,6 @@ public:
 
 }}
 
-Q_DECLARE_INTERFACE(Ology::Plugin::Interface, "org.ology.plugin.interface");
+Q_DECLARE_INTERFACE(Ology::Plugin::ScreenInterface, "org.Ology.Plugin.ScreenInterface");
 
 #endif

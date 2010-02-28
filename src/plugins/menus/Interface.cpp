@@ -7,7 +7,8 @@ namespace Ology {
 namespace Plugin {
 namespace Menus {
 
-bool Interface::initialize() {
+bool Interface::initialize(Ology::InitializePurpose initPurpose) {
+    Q_UNUSED(initPurpose);
     // TODO: read from settings
     return true;
 }

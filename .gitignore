@@ -1,0 +1,6 @@
+.gitignore
+src/build
+Makefile
+*.so
+*.so.*
+src/ology

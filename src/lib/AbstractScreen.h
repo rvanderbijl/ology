@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMetaType>
 #include <Ology/HasErrorString>
+#include <Ology/InitializePurpose>
 
 namespace Ology {
     class AbstractAction;
@@ -67,7 +68,7 @@ public:
      *
      * If the screen can not be displayed, return false. Ology will display errorString() to the user.
      */
-    virtual bool initialize() = 0;
+    virtual bool initialize(Ology::InitializePurpose purpose) = 0;
 
 public slots:
     /*! suspend is called when a child-screen is created and displayed.
