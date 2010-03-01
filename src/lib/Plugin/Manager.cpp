@@ -101,6 +101,7 @@ void Manager::unloadPlugins() {
 
 QList<Plugin::InfoInterface*> Manager::ologyPlugins() const {
     QList<Plugin::InfoInterface*> list;
+    list << OLOGY()->coreInfoInterface();
     foreach(QPluginLoader* loader, _plugins) {
         Plugin::InfoInterface* ii = qobject_cast<Plugin::InfoInterface*>(loader->instance());
         if (ii) { list << ii; }
@@ -109,6 +110,7 @@ QList<Plugin::InfoInterface*> Manager::ologyPlugins() const {
 }
 QList<ScreenInterface*> Manager::screenPlugins() const {
     QList<Plugin::ScreenInterface*> list;
+    list << OLOGY()->coreScreenInterface();
     foreach(QPluginLoader* loader, _plugins) {
         Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());
         if (si) { list << si; }

@@ -14,6 +14,8 @@ void AbstractSetting::setVariantValue(const QVariant &value) {
     const QString path = root() + "/" + name();
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ology.org", "ology");
     settings.setValue(path, value);
+
+    emit variantValueChanged(value);
 }
 
 QString AbstractSetting::displayValue() const {
@@ -25,6 +27,7 @@ QString AbstractSetting::displayValue() const {
     QByteArray data;
     QDataStream ds(data);
     */
+    return "TODO";
 }
 
 }

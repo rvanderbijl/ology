@@ -10,6 +10,7 @@ namespace Core {
 
 class QuitAction : public AbstractAction {
     Q_OBJECT
+    USE_HAS_NAME_DESCRIPTION
 public:
     enum ConfirmQuitOption { Quit, ConfirmQuit };
 

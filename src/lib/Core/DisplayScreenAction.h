@@ -15,6 +15,9 @@ public:
     DisplayScreenAction(QObject *parent);
     DisplayScreenAction(const QString &screenId, QObject *parent);
 
+    virtual QString name() const { return tr("Display screen %1").arg(screenId()); }
+    virtual QString description() const { return tr("Display screen %1").arg(screenId()); }
+
     virtual void run();
 
     QString screenId() const { return _screenId; }

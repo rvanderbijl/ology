@@ -12,7 +12,6 @@ public:
     virtual QList<AbstractSetting*> settings() const { return _settings; }
 
 protected:
-    void setSettings(const QList<AbstractSetting*> &list) { _settings = list; }
     void registerSetting(AbstractSetting* setting) { _settings.append(setting); }
 
 private:

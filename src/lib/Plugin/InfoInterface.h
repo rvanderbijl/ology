@@ -3,6 +3,7 @@
 
 #include <QStringList>
 #include <Ology/HasErrorString>
+#include <Ology/HasSettings>
 #include <Ology/InitializePurpose>
 
 class QWidget;
@@ -10,7 +11,7 @@ class QWidget;
 namespace Ology {
 namespace Plugin {
 
-class InfoInterface : public HasErrorString {
+class InfoInterface : public HasSettings, public HasErrorString {
 public:
     virtual QString name() const = 0;
     virtual QString version() const = 0;

@@ -1,16 +1,22 @@
 #ifndef OLOGY_SCREEN
 #define OLOGY_SCREEN
 
-#include <QWidget>
 #include <QMetaType>
+#include <QWidget>
+#include <Ology/HasNameDescription>
+#include <Ology/HasSettings>
 #include <Ology/HasErrorString>
 #include <Ology/InitializePurpose>
-#include <Ology/HasSettings>
 
 namespace Ology {
     class AbstractAction;
 
-class AbstractScreen : public QWidget, public HasSettings, public HasErrorString {
+class AbstractScreen :
+    public QWidget, 
+    public HasNameDescription,
+    public HasSettings, 
+    public HasErrorString
+{
     Q_OBJECT
 public:
     enum MusicUsage { MergeSound, GrabSound };
@@ -32,6 +38,8 @@ public:
      */
     AbstractScreen(QWidget *parent) : QWidget(parent), _screenState(ScreenSuspended) { setAutoFillBackground(true); setEnabled(false); }
 
+    /*! Return if this screen is running or suspended
+     */
     ScreenState screenState() const { return _screenState; }
 
     /*! Return the MusicUsage.
@@ -54,18 +62,11 @@ public:
      */
     virtual QString id() const = 0;
      
-    /*! Return the transalated name for this screen
-     */
-    virtual QString name() const = 0;
-     
-    /*! Return the transalated description for this screen
-     */
-    virtual QString description() const = 0;
-
-
     /*! initialize the screen
      *
-     * initialize the screen, loading whatever data/etc that is required
+     * Initialize the screen, loading whatever data/etc that is required. This function will only
+     * be called once. If this object is called with with Introspectdion purpose, it will never
+     * be run().
      *
      * If the screen can not be displayed, return false. Ology will display errorString() to the user.
      */

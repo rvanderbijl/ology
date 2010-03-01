@@ -17,9 +17,6 @@ Manager::Manager(int &argc, char** argv) :
     _pluginManager.loadPlugins( Ology::RealUsage, QStringList() << "libmenus.so" );
 
 
-    QAction *action = new Core::CloseScreenAction(&_window);
-    action->setShortcut(Qt::Key_Escape);
-    _window.addAction(action);
 
 /*
     QAction *exitAct = new QAction(tr("E&xit"), this);

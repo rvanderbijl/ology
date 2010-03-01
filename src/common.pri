@@ -1,6 +1,7 @@
 CONFIG -= release
 CONFIG += debug rtti
 INCLUDEPATH += $$PWD/include
+DEPENDPATH += $$PWD
 
 !contains(TARGET,OlogyLib) {
     LIBS += -L$$PWD -lOlogy

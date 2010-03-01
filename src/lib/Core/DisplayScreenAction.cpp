@@ -8,6 +8,9 @@ namespace Core {
 DisplayScreenAction::DisplayScreenAction(QObject *parent) :
     AbstractAction(parent)
 {
+    setTranslationContext(metaObject()->className());
+    setUntranslatedName("Display Screen");
+    setUntranslatedDescription("Display a screen by it's screen-id");
 }
 
 DisplayScreenAction::DisplayScreenAction(const QString &screenId, QObject *parent) :

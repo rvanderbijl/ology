@@ -4,9 +4,9 @@ TARGET=Ology
 TEMPLATE=lib
 
 # support classes
-HEADERS += AbstractScreen.h AbstractAction.h ManagerInterface.h
-HEADERS += Setting.h    HasSettings.h
-SOURCES += Setting.cpp  
+HEADERS += AbstractScreen.h AbstractAction.h 
+HEADERS += ManagerInterface.h   Setting.h    HasNameDescription.h HasSettings.h HasErrorString.h 
+SOURCES += ManagerInterface.cpp Setting.cpp  
 
 # plugins
 HEADERS += Plugin/Manager.h   Plugin/InfoInterface.h Plugin/ScreenInterface.h

@@ -8,6 +8,7 @@ namespace Core {
 
 class CloseScreenAction : public AbstractAction {
     Q_OBJECT
+    USE_HAS_NAME_DESCRIPTION
 public:
     CloseScreenAction(QObject *parent);
     virtual void run();

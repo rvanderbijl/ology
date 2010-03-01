@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingsEditor</class>
+ <widget class="QMainWindow" name="SettingsEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>740</width>
+    <height>652</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="_tabWidget">
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <widget class="QWidget" name="_tabScreens">
+       <attribute name="title">
+        <string>Screens</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="Ology::SettingsEditor::TreeWidget" name="_screenTree">
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Description</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="_tabActions">
+       <attribute name="title">
+        <string>Actions</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="Ology::SettingsEditor::TreeWidget" name="_actionTree">
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Description</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabPlugins">
+       <attribute name="title">
+        <string>Plugins</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Directory:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="_pluginDirectory"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="_pluginDirectoryBrowse">
+            <property name="text">
+             <string>Browse...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="_autoLoadPlugins">
+          <property name="text">
+           <string>Auto-load all plugins found</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Plugins loaded:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Ology::SettingsEditor::TreeWidget" name="_pluginsLoaded">
+             <column>
+              <property name="text">
+               <string>File</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Description</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="_removePluginButton">
+               <property name="text">
+                <string>Remove</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="_addPluginButton">
+               <property name="text">
+                <string>Add</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>740</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Ology::SettingsEditor::TreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>TreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>_pluginDirectoryBrowse</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsEditor</receiver>
+   <slot>onPluginDirectoryBrowse()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>719</x>
+     <y>121</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>761</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_pluginDirectory</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>SettingsEditor</receiver>
+   <slot>onPluginDirectoryChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>320</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_autoLoadPlugins</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>SettingsEditor</receiver>
+   <slot>onPluginAutoLoadChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>289</x>
+     <y>30</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_addPluginButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsEditor</receiver>
+   <slot>onPluginAdd()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>710</x>
+     <y>534</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>727</x>
+     <y>573</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_removePluginButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsEditor</receiver>
+   <slot>onPluginRemove()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>654</x>
+     <y>538</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>660</x>
+     <y>576</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_autoLoadPlugins</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>_removePluginButton</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>512</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>626</x>
+     <y>530</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_autoLoadPlugins</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>_addPluginButton</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>585</x>
+     <y>145</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>742</x>
+     <y>537</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onPluginDirectoryChanged(QString)</slot>
+  <slot>onPluginAutoLoadChanged()</slot>
+  <slot>onPluginDirectoryBrowse()</slot>
+  <slot>onPluginAdd()</slot>
+  <slot>onPluginRemove()</slot>
+ </slots>
+</ui>

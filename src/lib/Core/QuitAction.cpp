@@ -7,12 +7,14 @@ namespace Core {
 
 QuitAction::QuitAction(QObject *parent) :
     AbstractAction(parent),
-    _confirmQuitSetting(tr("action-quit"),
-                        tr("confirm-quit"),
-                        tr("Ask user to confirm that Ology should quit"),
-                        ConfirmQuit)
+    _confirmQuitSetting(tr("action-quit"), tr("confirm-quit"), ConfirmQuit,
+                        metaObject()->className(), "Confirm Quit", "Ask user to confirm that Ology should quit")
 {
     qRegisterMetaTypeStreamOperators<Ology::Core::QuitAction::ConfirmQuitOption>("Ology::Core::QuitAction::ConfirmQuitOption");
+
+    setTranslationContext(metaObject()->className());
+    setUntranslatedName("Quit Ology");
+    setUntranslatedDescription("Quit Ology, possbily ask confirmation");
 
     setText(tr("Quit Ology"));
     registerSetting(&_confirmQuitSetting);

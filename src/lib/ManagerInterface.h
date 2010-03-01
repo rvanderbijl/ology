@@ -5,14 +5,28 @@
 class QWidget;
 
 namespace Ology {
-namespace Plugin { class Manager; }
+namespace Plugin { 
+    class Manager; 
+    class InfoInterface; 
+    class ScreenInterface; 
+}
 
 class ManagerInterface {
 public:
+    ManagerInterface();
+    ~ManagerInterface();
+
     virtual Plugin::Manager* pluginManager() const = 0;
     virtual QWidget* screenParent() const = 0;
     virtual void displayScreen(const QString &id) = 0;
     virtual void closeCurrentScreen() = 0;
+
+    Plugin::InfoInterface* coreInfoInterface() { return _coreInfoInterface; }
+    Plugin::ScreenInterface* coreScreenInterface() { return _coreScreenInterface; }
+
+private:
+    Plugin::InfoInterface *_coreInfoInterface;
+    Plugin::ScreenInterface *_coreScreenInterface;
 };
 
 }

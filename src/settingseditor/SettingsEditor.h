@@ -12,17 +12,21 @@
 #include "ui_SettingsEditor.h"
 
 namespace Ology {
-namespace SettingsEditor {
+    class HasSettings;
     class AbstractScreen;
     class AbstractAction;
+
+namespace SettingsEditor {
    
 
 class Window : public QMainWindow, public Ui::SettingsEditor {
     Q_OBJECT
 public:
     Window();
-    
     void fillInValues();
+
+    void createSettingsEntries(QTreeWidgetItem *parent, HasSettings* hasSetting);
+    void createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInterface* plugin);
 
 
     QStringList specifiedPlugins();

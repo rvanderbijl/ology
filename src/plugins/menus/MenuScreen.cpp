@@ -12,6 +12,7 @@ MenuScreen::MenuScreen(const QString &id, QWidget *parent) :
     AbstractScreen(parent),
     _screenId(id)
 {
+    hide();
 }
 
 
