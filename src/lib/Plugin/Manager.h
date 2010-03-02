@@ -17,8 +17,10 @@ namespace Plugin {
     class ScreenInterface;
 
 class Manager : public QObject {
+    Q_OBJECT
 public:
     Manager(QObject *parent = 0);
+    virtual ~Manager() {}
 
     QString pluginSearchDirectory() const { return _pluginSearchDirectory; }
     void setPluginSearchDirectory(const QString &dir) { _pluginSearchDirectory = dir; }
@@ -34,10 +36,12 @@ public:
 
     AbstractScreen* createScreen(const QString &id);
 
-private:
-     QString _pluginSearchDirectory;
-     QList<QPluginLoader*> _plugins;
-     QHash<QString, QObject*> _screenFactory;
+    void registerScreens(QObject *instance);
+
+
+    QString _pluginSearchDirectory;
+    QList<QPluginLoader*> _plugins;
+    QHash<QString, QObject*> _screenFactory;
 };
 
 

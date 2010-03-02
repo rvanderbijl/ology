@@ -15,9 +15,9 @@ public:
     
     void setMenuActions(const QList<AbstractAction*> &actions) { _menuActions = actions; }
 
-    virtual QString id() const { return _screenId; }
-    virtual QString name() const { return "Name:" + _screenId; }
-    virtual QString description() const { return "Desc:" + _screenId; }
+    virtual QString id() const { return "menu-"+_screenId; }
+    virtual QString name() const { return "Menu " + _screenId; }
+    virtual QString description() const { return "Menu screen " + _screenId; }
 
     virtual QList<AbstractAction*> actions() const;
     virtual bool initialize(Ology::InitializePurpose initPurpose);

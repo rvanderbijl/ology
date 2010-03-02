@@ -1,5 +1,5 @@
-#ifndef OLOGY_SCREEN
-#define OLOGY_SCREEN
+#ifndef OLOGY_ABSTRACT_SCREEN
+#define OLOGY_ABSTRACT_SCREEN
 
 #include <QMetaType>
 #include <QWidget>
@@ -10,6 +10,7 @@
 
 namespace Ology {
     class AbstractAction;
+    class SimpleScreenAction;
 
 class AbstractScreen :
     public QWidget, 
@@ -36,7 +37,7 @@ public:
      *
      * New screens are always created suspended. The Ology system will call run() as appropriate.
      */
-    AbstractScreen(QWidget *parent) : QWidget(parent), _screenState(ScreenSuspended) { setAutoFillBackground(true); setEnabled(false); }
+    AbstractScreen(QWidget *parent) : QWidget(parent), _screenState(ScreenSuspended) { setAutoFillBackground(true); setEnabled(false); hide(); }
 
     /*! Return if this screen is running or suspended
      */
@@ -56,7 +57,7 @@ public:
 
     /*! Return the local actions for this screen.
      */
-    virtual QList<AbstractAction*> actions() const = 0;
+    virtual QList<AbstractAction*> actions() const { return _actions; }
 
     /*! Return a unique ID for this screen
      */
@@ -93,9 +94,12 @@ public slots:
 
 protected:
     void setScreenState(ScreenState screenState) { _screenState = screenState; }
+    void registerLocalAction(AbstractAction *action) { _actions << action; addAction((QAction*)action); }
+    friend class SimpleScreenAction;
 
 private:
     ScreenState _screenState;
+    QList<AbstractAction*> _actions;
 };
 
 

@@ -1,3 +1,4 @@
+#include <Ology/Plugin/ScreenInterface>
 #include <Ology/AbstractScreen>
 #include <Ology/Core/CloseScreenAction>
 
@@ -15,7 +16,15 @@ Manager::Manager(int &argc, char** argv) :
     setApplicationName("ology");
     addLibraryPath(".");
     _pluginManager.loadPlugins( Ology::RealUsage, QStringList() << "libmenus.so" );
+    _pluginManager.registerScreens(OLOGY()->coreInstance());
 
+
+    foreach(Plugin::ScreenInterface *si, _pluginManager.screenPlugins()) {
+        foreach(AbstractAction *action, si->globalActions()) {
+            qDebug() << "adding action: " << action->name();
+            _window.addAction(action);
+        }
+    }
 
 
 /*

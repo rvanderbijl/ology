@@ -1,4 +1,5 @@
 #include <QDebug>
+#include "CoreIds.h"
 #include "QuitAction.h"
 #include "ManagerInterface.h"
 
@@ -23,7 +24,7 @@ QuitAction::QuitAction(QObject *parent) :
 void QuitAction::run() {
     qDebug() << "QuitAction triggered";
     if (_confirmQuitSetting.value() == ConfirmQuit) {
-        // TODO: confirm-quit screen
+        OLOGY()->displayScreen(ID_SCREEN_CONFIRM_QUIT); 
     } else {
         qApp->quit();
     }

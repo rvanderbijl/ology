@@ -1,5 +1,5 @@
-#ifndef OLOGY_ACTION
-#define OLOGY_ACTION
+#ifndef OLOGY_ABSTRACT_ACTION
+#define OLOGY_ABSTRACT_ACTION
 
 #include <QAction>
 #include <Ology/HasNameDescription>

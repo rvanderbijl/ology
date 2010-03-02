@@ -23,10 +23,12 @@ public:
 
     Plugin::InfoInterface* coreInfoInterface() { return _coreInfoInterface; }
     Plugin::ScreenInterface* coreScreenInterface() { return _coreScreenInterface; }
+    QObject* coreInstance() { return _object; }
 
 private:
     Plugin::InfoInterface *_coreInfoInterface;
     Plugin::ScreenInterface *_coreScreenInterface;
+    QObject *_object;
 };
 
 }

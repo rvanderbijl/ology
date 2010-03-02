@@ -62,13 +62,7 @@ void Manager::loadPlugins(Ology::InitializePurpose purpose, const QStringList &p
         Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());
         if (si) {
             qDebug() << "Plugin" << ii->name() << "provides ScreenInterface";
-            foreach(const QString &screenId, si->screenIds()) {
-                if (_screenFactory.contains(screenId)) {
-                    Plugin::InfoInterface* otherIi = qobject_cast<Plugin::InfoInterface*>(_screenFactory[screenId]);
-                    qWarning() << "Replacing screenId " << screenId << "factory" << otherIi->name() << "with" << ii->name();
-                }
-                _screenFactory[screenId] = loader->instance();
-            }
+            registerScreens(loader->instance());
         }
     }
 }
@@ -97,6 +91,7 @@ void Manager::unloadPlugins() {
     }
     _screenFactory.clear();
     _plugins.clear();
+    registerScreens(OLOGY()->coreInstance());
 }
 
 QList<Plugin::InfoInterface*> Manager::ologyPlugins() const {
@@ -118,6 +113,19 @@ QList<ScreenInterface*> Manager::screenPlugins() const {
     return list;
 }
 
+
+void Manager::registerScreens(QObject *object) {
+    Plugin::InfoInterface* ii = qobject_cast<Plugin::InfoInterface*>(object);
+    Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(object);
+
+    foreach(const QString &screenId, si->screenIds()) {
+        if (_screenFactory.contains(screenId)) {
+            Plugin::InfoInterface* otherIi = qobject_cast<Plugin::InfoInterface*>(_screenFactory[screenId]);
+            qWarning() << "Replacing screenId " << screenId << "factory" << otherIi->name() << "with" << ii->name();
+        }
+        _screenFactory[screenId] = object;
+    }
+}
 
 AbstractScreen* Manager::createScreen(const QString &id) {
     if (!_screenFactory.contains(id)) {
