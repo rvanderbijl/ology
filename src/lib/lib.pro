@@ -20,5 +20,6 @@ HEADERS += Core/QuitAction.h    Core/DisplayScreenAction.h    Core/CloseScreenAc
 SOURCES += Core/QuitAction.cpp  Core/DisplayScreenAction.cpp  Core/CloseScreenAction.cpp
 
 # core screens
-HEADERS += Core/ConfirmQuitScreen.h  
-SOURCES += Core/ConfirmQuitScreen.cpp
+FORMS += Core/AbstractDialogScreen.ui
+HEADERS += Core/AbstractDialogScreen.h   Core/ConfirmQuitScreen.h  
+SOURCES += Core/AbstractDialogScreen.cpp Core/ConfirmQuitScreen.cpp

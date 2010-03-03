@@ -1,13 +1,13 @@
 #ifndef OLOGY_CORE_SCREEN_CONFIRM_QUIT
 #define OLOGY_CORE_SCREEN_CONFIRM_QUIT
 
-#include <Ology/AbstractScreen>
+#include "AbstractDialogScreen.h"
 #include "CoreIds.h"
 
 namespace Ology {
 namespace Core {
 
-class ConfirmQuitScreen : public AbstractScreen {
+class ConfirmQuitScreen : public AbstractDialogScreen {
     Q_OBJECT
 public:
     ConfirmQuitScreen(QWidget *parent);
@@ -15,8 +15,10 @@ public:
     virtual QString id() const { return ID_SCREEN_CONFIRM_QUIT; }
     virtual QString name() const { return "Confirm Quit Screen"; }
     virtual QString description() const { return "Ask the user if they really which to quit Ology"; }
+    virtual QString dialogText() const { return tr("Are you sure you wish to cancel?"); }
 
     virtual bool initialize(Ology::InitializePurpose initPurpose);
+
 
 public slots:
     void quit();
