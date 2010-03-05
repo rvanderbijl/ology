@@ -10,13 +10,13 @@ namespace Ology {
 namespace Core {
 
 PseudoPluginInterface::PseudoPluginInterface() :
-    _closeMainScreen(tr("core"), tr("close-main-screen-result"), ConfirmQuit,
-                     metaObject()->className(), "Close main screen result", "The result of closing the main screen", this)
+    _closeMainScreenOption(tr("core"), tr("close-main-screen-result"), ConfirmQuit,
+                           metaObject()->className(), "Close main screen result", "The result of closing the main screen", this)
 {
 
     qRegisterMetaTypeStreamOperators<Ology::Core::PseudoPluginInterface::CloseMainScreenOption>("Ology::Core::PseudoPluginInterface::CloseMainScreenOption");
 
-    registerSetting(&_closeMainScreen);
+    registerSetting(&_closeMainScreenOption);
 
 
     AbstractAction *action = NULL;

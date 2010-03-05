@@ -15,16 +15,16 @@
 namespace Ology {
 
 ManagerInterface::ManagerInterface() :
-    _object(NULL)
+    _pseudoPlugin(NULL)
 {
-    _object = new Core::PseudoPluginInterface();
-    _coreInfoInterface = qobject_cast<Plugin::InfoInterface*>(_object);
-    _coreScreenInterface = qobject_cast<Plugin::ScreenInterface*>(_object);
+    _pseudoPlugin = new Core::PseudoPluginInterface();
+    _coreInfoInterface = qobject_cast<Plugin::InfoInterface*>(_pseudoPlugin);
+    _coreScreenInterface = qobject_cast<Plugin::ScreenInterface*>(_pseudoPlugin);
 }
 
 ManagerInterface::~ManagerInterface() {
-    delete _object;
-    _object = NULL;
+    delete _pseudoPlugin;
+    _pseudoPlugin = NULL;
     _coreInfoInterface = NULL;
     _coreScreenInterface = NULL;
 }

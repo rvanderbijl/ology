@@ -1,6 +1,8 @@
 #include <Ology/Plugin/ScreenInterface>
 #include <Ology/AbstractScreen>
 #include <Ology/Core/CloseScreenAction>
+#include "../lib/Core/PseudoPluginInterface.h"
+#include "../lib/Core/CoreIds.h"
 
 #include <QStringList>
 #include <QDebug>
@@ -70,16 +72,15 @@ void Manager::closeCurrentScreen() {
     AbstractScreen *screen = NULL;
 
     // kill the current screen (if there is one):
-    if (_screens.size() <= 1) { return; }
+    if (_screens.size() <= 1) { 
+        Core::PseudoPluginInterface::CloseMainScreenOption option = _pseudoPlugin->closeMainScreenOptionSetting()->value();
+        if (option == Core::PseudoPluginInterface::Quit) { qApp->quit(); }
+        else if (option == Core::PseudoPluginInterface::ConfirmQuit) { displayScreen(ID_SCREEN_CONFIRM_QUIT); }
+        return;
+    }
     screen = _screens.pop();
     screen->suspend();
     screen->deleteLater();
-
-    // if there was no previous screen, abort:
-    if (!_screens.size()) {
-        _window.setScreen(NULL);
-        return; 
-    }
 
     // restore the previous screen
     screen = _screens.top();

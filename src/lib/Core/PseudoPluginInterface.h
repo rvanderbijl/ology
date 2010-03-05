@@ -1,11 +1,10 @@
-#ifndef OLOGY_CORE_INTERFACE
-#define OLOGY_CORE_INTERFACE
+#ifndef OLOGY_CORE_PSEUDO_PLUGIN_INTERFACE
+#define OLOGY_CORE_PSEUDO_PLUGIN_INTERFACE
 
 #include <QObject>
 #include <Ology/Plugin/InfoInterface>
 #include <Ology/Plugin/ScreenInterface>
 #include <Ology/Setting>
-
 
 namespace Ology {
 namespace Core {
@@ -26,21 +25,25 @@ public:
     PseudoPluginInterface();
     virtual ~PseudoPluginInterface() {}
 
+    Setting<CloseMainScreenOption> * closeMainScreenOptionSetting() { return &_closeMainScreenOption; }
+
+private:
+    QList<AbstractAction*> _actions;
+    Setting<CloseMainScreenOption> _closeMainScreenOption;
+
+// Plugin::InfoInterface
 public:
     virtual QString name() const { return "Core Psuedo Plugin Interface"; }
     virtual QString version() const { return "1.0"; }
     virtual QString description() const { return "Psuedo plugin providing core screens and actions"; }
     virtual bool initialize(Ology::InitializePurpose) { return true; }
 
+// Plugin::ScreenInterface
 public:
     virtual QStringList screenIds();
     virtual AbstractScreen* createScreen(const QString &id, QWidget *parent);
     virtual QList<AbstractAction*> globalActions() { return _actions; }
 
-private:
-    QList<AbstractAction*> _actions;
-
-    Setting<CloseMainScreenOption> _closeMainScreen;
 };
 
 }}

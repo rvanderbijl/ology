@@ -10,6 +10,9 @@ namespace Plugin {
     class InfoInterface; 
     class ScreenInterface; 
 }
+namespace Core {
+    class PseudoPluginInterface;
+}
 
 class ManagerInterface {
 public:
@@ -23,12 +26,12 @@ public:
 
     Plugin::InfoInterface* coreInfoInterface() { return _coreInfoInterface; }
     Plugin::ScreenInterface* coreScreenInterface() { return _coreScreenInterface; }
-    QObject* coreInstance() { return _object; }
+    QObject* coreInstance() { return (QObject*)_pseudoPlugin; }
 
-private:
+protected:
     Plugin::InfoInterface *_coreInfoInterface;
     Plugin::ScreenInterface *_coreScreenInterface;
-    QObject *_object;
+    Core::PseudoPluginInterface *_pseudoPlugin;
 };
 
 }
