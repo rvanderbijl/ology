@@ -3,7 +3,36 @@
 
 #include <QVariant>
 #include <QObject>
+#include <QComboBox>
+#include <QMetaEnum>
+#include <QDataStream>
+#include <QDebug>
+
 #include <Ology/HasNameDescription>
+
+
+/*! \brief This makes QDataStream << and >> operators so that the enum can be used as a setting.
+ * 
+ * This uses the QMetaObject of the specified class. The enum must be registered using Q_ENUMS.
+ * It should be used outside of all namespaces. 
+ */
+#define OLOGY_DECLARE_OPERATORS_FOR_ENUM(class, enum) \
+    QDataStream &operator<<(QDataStream &out, const class::enum &value) { \
+        int idx = class::staticMetaObject.indexOfEnumerator(#enum); \
+        out << class::staticMetaObject.enumerator(idx).key(value); \
+        return out; \
+    } \
+    QDataStream &operator>>(QDataStream &in, class::enum &value) { \
+        int idx = class::staticMetaObject.indexOfEnumerator(#enum); \
+        char *buf = NULL; \
+        in >> buf; \
+        value = (class::enum)class::staticMetaObject.enumerator(idx).keyToValue(buf); \
+        delete buf; buf = NULL; \
+        return in; \
+    }
+
+
+
 
 class QItemEditorCreatorBase;
 
@@ -30,8 +59,9 @@ public:
     void setRoot(const QString &root) { _root = root; }
     void setId(const QString &id) { _id = id; }
 
-    virtual QItemEditorCreatorBase* editorCreator() { return NULL; }
     virtual QString displayValue() const;
+    virtual QWidget* createEditor(QWidget *parent) { Q_UNUSED(parent); return NULL; }
+    virtual bool takeValueFromEditor(QWidget *editor) { Q_UNUSED(editor); return NULL; }
 
     QVariant variantValue() const;
     QVariant defaultVariantValue() const { return _defaultValue; }
@@ -70,8 +100,75 @@ public:
 
     void setValue(const T &value) { setVariantValue(QVariant::fromValue<T>(value)); }
     void setDefaultValue(const T &defaultValue) { setDefaultVariantValue(QVariant::fromValue<T>(defaultValue)); }
+
+    virtual QWidget* createEditor(QWidget *parent);
+    virtual bool takeValueFromEditor(QWidget *editor);
 };
 
+/*
+template<class T>
+class EnumSettings : public Setting<T> {
+public:
+    EnumSetting(QObject *parent = 0) : Setting(parent) {}
+    EnumSetting(const QString &root, const QString &id, const T & defaultValue,
+            const char* trContext = 0, const char*name = 0, const char *desc = 0, QObject *parent = 0) : 
+        Setting(root, id, QVariant::fromValue(defaultValue), trContext, name, desc, parent) 
+    {
+    }
+ 
+};
+*/
+
+
+template<class T>
+QWidget* Setting<T>::createEditor( QWidget * parent ) {
+    // check if T is an enum:
+    const int metaTypeId = qMetaTypeId<T>();
+    const QString name = QString(QMetaType::typeName(metaTypeId)).section("::", -1, -1);
+    const int metaEnumIdx = this->parent() == NULL ? -1 : this->parent()->metaObject()->indexOfEnumerator(name.toLocal8Bit());
+
+    if (metaEnumIdx > -1) {
+        QComboBox *cb = new QComboBox(parent);
+        QMetaEnum metaEnum = this->parent()->metaObject()->enumerator(metaEnumIdx);
+        for(int i = 0; i < metaEnum.keyCount(); i++) {
+            const int enumValue = metaEnum.value(i);
+            const QString enumName = metaEnum.valueToKey(enumValue);
+            cb->addItem(enumName, QVariant::fromValue((T)enumValue));
+            if (enumValue == this->value()) {
+                cb->setCurrentIndex( cb->count() - 1);
+            }
+        }
+
+        return cb;
+    }
+
+    return NULL;
 }
+
+template<class T>
+bool Setting<T>::takeValueFromEditor(QWidget *editor) {
+    // check if T is an enum:
+    const int metaTypeId = qMetaTypeId<T>();
+    const QString name = QString(QMetaType::typeName(metaTypeId)).section("::", -1, -1);
+    const int metaEnumIdx = this->parent() == NULL ? -1 : this->parent()->metaObject()->indexOfEnumerator(name.toLocal8Bit());
+
+    if (metaEnumIdx > -1) {
+        QComboBox *cb = qobject_cast<QComboBox*>(editor);
+        Q_ASSERT(cb);
+        QVariant v = cb->itemData( cb->currentIndex() );
+        if (v.userType() == metaTypeId) {
+            setValue( v.value<T>() );
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
+}
+
+Q_DECLARE_METATYPE(Ology::AbstractSetting*)
 
 #endif

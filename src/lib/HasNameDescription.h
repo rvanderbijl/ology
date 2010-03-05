@@ -41,6 +41,10 @@ protected:
     virtual QString translatedName() const { return QApplication::translate(_context, _untranslatedName); }
     virtual QString translatedDescription() const { return QApplication::translate(_context, _untranslatedDescription); }
 
+    const char* translationContext() const { return _context; }
+    const char* untranslatedName() const { return _untranslatedName; }
+    const char* untranslatedDescription() const { return _untranslatedDescription; }
+
 private:
     const char *_context;
     const char *_untranslatedName;

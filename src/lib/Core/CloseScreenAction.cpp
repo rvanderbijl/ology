@@ -10,7 +10,7 @@ CloseScreenAction::CloseScreenAction(QObject *parent) :
 {
     setTranslationContext(metaObject()->className());
     setUntranslatedName("Close Screen");
-    setUntranslatedName("Close the current screen, go back to the previous screen");
+    setUntranslatedDescription("Close the current screen, go back to the previous screen");
     setText(tr("Close screen"));
 }
 

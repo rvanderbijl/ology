@@ -1,7 +1,7 @@
 CONFIG -= release
 CONFIG += debug rtti
 INCLUDEPATH += $$PWD/include
-DEPENDPATH += $$PWD
+DEPENDPATH += $$PWD $$PWD/lib $$PWD/include $$PWD/include/Ology/ $$PWD/include/Ology/Core
 
 !contains(TARGET,OlogyLib) {
     LIBS += -L$$PWD -lOlogy

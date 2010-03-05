@@ -9,7 +9,7 @@ namespace Core {
 QuitAction::QuitAction(QObject *parent) :
     AbstractAction(parent),
     _confirmQuitSetting(tr("action-quit"), tr("confirm-quit"), ConfirmQuit,
-                        metaObject()->className(), "Confirm Quit", "Ask user to confirm that Ology should quit")
+                        metaObject()->className(), "Confirm Quit", "Ask user to confirm that Ology should quit", this)
 {
     qRegisterMetaTypeStreamOperators<Ology::Core::QuitAction::ConfirmQuitOption>("Ology::Core::QuitAction::ConfirmQuitOption");
 
@@ -30,6 +30,9 @@ void QuitAction::run() {
     }
 }
 
+OLOGY_DECLARE_OPERATORS_FOR_ENUM(Ology::Core::QuitAction, ConfirmQuitOption);
+
+/*
 QDataStream &operator<<(QDataStream &out, const Ology::Core::QuitAction::ConfirmQuitOption &value) {
     switch(value) {
         case Ology::Core::QuitAction::Quit: out << "Quit";
@@ -52,5 +55,6 @@ QDataStream &operator>>(QDataStream &in, Ology::Core::QuitAction::ConfirmQuitOpt
 
     return in;
 }
+*/
 
 }}

@@ -12,8 +12,8 @@ SOURCES += ManagerInterface.cpp Setting.cpp
 HEADERS += Plugin/Manager.h   Plugin/InfoInterface.h Plugin/ScreenInterface.h
 SOURCES += Plugin/Manager.cpp
 
-HEADERS += CoreInterface.h   Core/CoreIds.h
-SOURCES += CoreInterface.cpp
+HEADERS += Core/PseudoPluginInterface.h   Core/CoreIds.h
+SOURCES += Core/PseudoPluginInterface.cpp
 
 # core actions
 HEADERS += Core/QuitAction.h    Core/DisplayScreenAction.h    Core/CloseScreenAction.h

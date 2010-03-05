@@ -3,7 +3,7 @@
 #include "Plugin/InfoInterface.h"
 #include "Plugin/ScreenInterface.h"
 
-#include "CoreInterface.h"
+#include "Core/PseudoPluginInterface.h"
 
 #include "Core/CoreIds.h"
 #include "Core/CloseScreenAction.h"
@@ -17,7 +17,7 @@ namespace Ology {
 ManagerInterface::ManagerInterface() :
     _object(NULL)
 {
-    _object = new CoreInterface();
+    _object = new Core::PseudoPluginInterface();
     _coreInfoInterface = qobject_cast<Plugin::InfoInterface*>(_object);
     _coreScreenInterface = qobject_cast<Plugin::ScreenInterface*>(_object);
 }

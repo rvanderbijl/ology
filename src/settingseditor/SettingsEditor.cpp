@@ -27,7 +27,7 @@ Window::Window() :
     _settings(QSettings::IniFormat, QSettings::UserScope, "ology.org", "ology")
 {
     setupUi(this);
-    _pluginsLoaded->setEditableColumn(2);
+    _pluginTree->setEditableColumn(2);
     _tabWidget->setCurrentIndex(0);
 }
 
@@ -38,16 +38,20 @@ void Window::fillInValues() {
 
 
 void Window::createSettingsEntries(QTreeWidgetItem *parent, HasSettings* hasSettings) {
+    const bool forPluginTree = (parent->treeWidget() == _pluginTree);
     QList<AbstractSetting*> settings = hasSettings->settings();
     if (settings.isEmpty()) {
-        QTreeWidgetItem *item = new QTreeWidgetItem(parent, QStringList() << "No settings");
+        QTreeWidgetItem *item = new QTreeWidgetItem(parent, QStringList() << tr("No settings"));
         item->setFirstColumnSpanned(true);
         return;
     }
 
     foreach(AbstractSetting* setting, settings) {
-        QTreeWidgetItem *item = new QTreeWidgetItem(parent, QStringList() << setting->name() << setting->displayValue() << setting->description());
-        item->setData(0, AS_ROLE, QVariant::fromValue(setting));
+        QTreeWidgetItem *item = new QTreeWidgetItem(parent, 
+                   forPluginTree ? QStringList() << "" << setting->name() << setting->displayValue() << setting->description() // extra column for plugin-filename
+                                 : QStringList()       << setting->name() << setting->displayValue() << setting->description());
+        item->setIcon(forPluginTree ? 1 : 0, QIcon(":icon/icon_setting.png")); // name column
+        item->setData(forPluginTree ? 2 : 1, AS_ROLE, QVariant::fromValue(setting)); // value column
         item->setFlags( item->flags() | Qt::ItemIsEditable );
     }
 }
@@ -59,12 +63,17 @@ void Window::createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInte
 
     // for plugin's global actions
     QList<AbstractAction*> actions = si->globalActions();
+    QTreeWidgetItem *pluginActionItem = new QTreeWidgetItem(_actionTree, QStringList() << ii->name() << "" << ii->description());
+    pluginActionItem->setIcon(0, QIcon(":icon/icon_plugin.png"));
     if (actions.count()) {
-        QTreeWidgetItem *pluginActionItem = new QTreeWidgetItem(_actionTree, QStringList() << ii->name() << "" << ii->description());
         foreach(AbstractAction * action, actions) {
             QTreeWidgetItem *actionItem = new QTreeWidgetItem(pluginActionItem, QStringList() << action->name() << "" << action->description());
+            actionItem->setIcon(0, QIcon(":icon/icon_action.png"));
             createSettingsEntries(actionItem, action);
         }
+    } else {
+        new QTreeWidgetItem(pluginActionItem, QStringList() << tr("No actions"));
+
     }
 
 
@@ -72,6 +81,7 @@ void Window::createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInte
     QStringList screenIds = si->screenIds();
     if (screenIds.count()) {
         QTreeWidgetItem *pluginScreenItem = new QTreeWidgetItem(_screenTree, QStringList() << ii->name() << "" << ii->description());
+        pluginScreenItem->setIcon(0, QIcon(":icon/icon_plugin.png"));
         foreach(const QString &screenId, screenIds) {
             AbstractScreen *screen = OLOGY()->pluginManager()->createScreen(screenId);
             if (!screen) { continue; }
@@ -82,15 +92,25 @@ void Window::createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInte
             }
 
             QTreeWidgetItem *screenItem = new QTreeWidgetItem(pluginScreenItem, QStringList() << screen->name() << "" << screen->description());
-            createSettingsEntries(screenItem, screen);
+            QTreeWidgetItem *screenSettingsItem = new QTreeWidgetItem(screenItem, QStringList() << tr("Settings"));
+            QTreeWidgetItem *screenActionsItem = new QTreeWidgetItem(screenItem, QStringList() << tr("Actions"));
+
+            screenItem->setIcon(0, QIcon(":icon/icon_screen.png"));
+            screenSettingsItem->setIcon(0, QIcon(":icon/icon_setting.png"));
+            screenActionsItem->setIcon(0, QIcon(":icon/icon_action.png"));
+
+            createSettingsEntries(screenSettingsItem, screen);
 
             // screen's actions:
             actions = screen->actions();
             if (actions.count()) {
                 foreach(AbstractAction * action, actions) {
-                    QTreeWidgetItem *actionItem = new QTreeWidgetItem(screenItem, QStringList() << action->name() << "" << action->description());
+                    QTreeWidgetItem *actionItem = new QTreeWidgetItem(screenActionsItem, QStringList() << action->name() << "" << action->description());
+                    actionItem->setIcon(0, QIcon(":icon/icon_action.png"));
                     createSettingsEntries(actionItem, action);
                 }
+            } else {
+                new QTreeWidgetItem(screenActionsItem, QStringList() << tr("No actions"));
             }
         }
     }
@@ -99,8 +119,8 @@ void Window::createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInte
 
 QStringList Window::specifiedPlugins() {
     QStringList specifiedPlugins;
-    for(int i = 0; i < _pluginsLoaded->topLevelItemCount(); i++) {
-        specifiedPlugins << _pluginsLoaded->topLevelItem(i)->text(0);
+    for(int i = 0; i < _pluginTree->topLevelItemCount(); i++) {
+        specifiedPlugins << _pluginTree->topLevelItem(i)->text(0);
     }
     return specifiedPlugins;
 }
@@ -119,13 +139,14 @@ void Window::reloadPlugins() {
 }
 
 void Window::updatedLoadedPlugins(const QStringList & specifiedPluginsOrig) {
-    _pluginsLoaded->clear();
+    _pluginTree->clear();
     _actionTree->clear();
     _screenTree->clear();
 
 
     Plugin::InfoInterface *cii = OLOGY()->coreInfoInterface(); 
-    QTreeWidgetItem *coreItem = new QTreeWidgetItem(_pluginsLoaded, QStringList() << "Internal" << cii->name() << cii->version() << cii->description());
+    QTreeWidgetItem *coreItem = new QTreeWidgetItem(_pluginTree, QStringList() << "Internal" << cii->name() << cii->version() << cii->description());
+    coreItem->setIcon(0, QIcon(":icon/icon_plugin.png"));
     createSettingsEntries(coreItem, cii);
     createSettingsEntries(OLOGY()->coreScreenInterface(), cii);
 
@@ -138,7 +159,8 @@ void Window::updatedLoadedPlugins(const QStringList & specifiedPluginsOrig) {
         Plugin::InfoInterface *ii = qobject_cast<Plugin::InfoInterface*>(loader->instance());
         Plugin::ScreenInterface *si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());
 
-        QTreeWidgetItem *item = new QTreeWidgetItem(_pluginsLoaded, QStringList() << fileName << ii->name() << ii->version() << ii->description());
+        QTreeWidgetItem *item = new QTreeWidgetItem(_pluginTree, QStringList() << fileName << ii->name() << ii->version() << ii->description());
+        item->setIcon(0, QIcon(":icon/icon_plugin.png"));
         if (si) {
             QTreeWidgetItem *pluginTreeItem = new QTreeWidgetItem(item, QStringList() << "ScreenInterface implemented");
             pluginTreeItem->setFirstColumnSpanned(true);
@@ -149,10 +171,14 @@ void Window::updatedLoadedPlugins(const QStringList & specifiedPluginsOrig) {
     }
 
     foreach(const QString &fileName, specifiedPlugins) {
-        QTreeWidgetItem *item = new QTreeWidgetItem(_pluginsLoaded, QStringList() << fileName << "" << "" << "not loaded");
+        QTreeWidgetItem *item = new QTreeWidgetItem(_pluginTree, QStringList() << fileName << "" << "" << "not loaded");
         item->setForeground(0, Qt::red);
         item->setForeground(3, Qt::red);
     }
+
+    _pluginTree->resizeColumnToContents(0);
+    _actionTree->resizeColumnToContents(0);
+    _screenTree->resizeColumnToContents(0);
 }
 
 
@@ -183,15 +209,15 @@ void Window::onPluginAdd() {
     QStringList specifiedPlugins;
     specifiedPlugins << fileName;
 
-    QTreeWidgetItemIterator it(_pluginsLoaded);
+    QTreeWidgetItemIterator it(_pluginTree);
     while (*it) { specifiedPlugins << (*it)->text(0); it++; }
-    _pluginsLoaded->clear();
+    _pluginTree->clear();
 
     updatedLoadedPlugins(specifiedPlugins);
 }
 
 void Window::onPluginRemove() {
-    QTreeWidgetItem *item = _pluginsLoaded->currentItem();
+    QTreeWidgetItem *item = _pluginTree->currentItem();
     if (!item) { return; }
     if (item->parent()) { item = item->parent(); }
     delete item;
@@ -201,9 +227,4 @@ void Window::onPluginRemove() {
 }
 
 
-
-
-
 }}
-
-Q_DECLARE_METATYPE(Ology::AbstractSetting*)

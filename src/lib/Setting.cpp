@@ -1,4 +1,7 @@
+#include <QBuffer>
+#include <QDebug>
 #include <QSettings>
+#include <QComboBox>
 
 #include "Setting.h"
 
@@ -19,15 +22,21 @@ void AbstractSetting::setVariantValue(const QVariant &value) {
 }
 
 QString AbstractSetting::displayValue() const {
-    QString display = variantValue().toString();
+    const QVariant variant = variantValue();
+    QString display = variant.toString();
     if (!display.isEmpty()) { return display; }
 
-    // TODO
-    /*
-    QByteArray data;
-    QDataStream ds(data);
-    */
-    return "TODO";
+    QBuffer buf;
+    buf.open(QIODevice::ReadWrite);
+    QDataStream ds(&buf);
+    const bool b = QMetaType::save(ds, variant.userType(), variant.constData());
+    if (!b) {
+        qDebug() << "Failed to create a displayValue for setting:" << untranslatedName();
+    }
+
+    return QString::fromLocal8Bit(buf.data().mid(4)); // skip QDataStream header 
 }
+
+
 
 }

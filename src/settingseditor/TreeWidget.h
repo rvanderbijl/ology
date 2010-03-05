@@ -10,9 +10,8 @@ namespace SettingsEditor {
 
 class TreeWidget : public QTreeWidget {
 public:
-    TreeWidget(QWidget *parent) : QTreeWidget(parent), _editableColumn(1) {}
+    TreeWidget(QWidget *parent);
     virtual bool edit(const QModelIndex &index, EditTrigger trigger, QEvent *event);
-
     void setEditableColumn(int column) { _editableColumn = column; }
 private:
     int _editableColumn;
