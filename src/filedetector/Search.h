@@ -2,33 +2,33 @@
 #define FILEDETECTOR_SEARCH
 
 #include <QObject>
+#include <QMetaType>
 #include <QUrl>
 #include "SearchParameters.h"
 
 namespace FileDetector {
-    class Interface;
-    class Worker;
+    class WorkerThreadController;
 
 class Search : public QObject {
+    Q_OBJECT
 public:
     enum Error {
-        ErrorNonInterfaceParent,
         ErrorWorkerThreadNotRunning,
         ErrorAddingSearchToWorkerThread,
     };
 
-    Search(const SearchParameters & parameters, Interface *interface);
+    Search(const SearchParameters & parameters, QObject *parent);
 
     const SearchParameters& searchParameters() const { return _parameters; }
 
     static QString errorString(Error code);
 
 public slots:
-    void startOneTimeSearch();
+    void startOneTimeSearch(WorkerThreadController *threadController);
     void startContinuousSearch();
 
 signals:
-    void searchError(Error error);
+    void searchError(FileDetector::Search::Error error);
     void oneTimeSearchStarted();
     void oneTimeSearchCompleted();
 
@@ -36,17 +36,16 @@ signals:
     void continuousSearchVerified();
 
     void progress(int i, int total);
-    void filesAdded(const QString &key, const QList<QUrl> &files);
-    void filesRemoved(const QString &key, const QList<QUrl> &files);
+    void filesAdded(const QList<QUrl> &files);
+    void filesRemoved(const QList<QUrl> &files);
 
 protected: // allow search-worker access to it
     Search(const Search* search);
     SearchParameters _parameters;
 };
 
-
-
-
 }
+
+Q_DECLARE_METATYPE(QList<QUrl>);
 
 #endif

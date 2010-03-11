@@ -7,6 +7,7 @@
 #include <QMetaEnum>
 #include <QDataStream>
 #include <QDebug>
+#include <QItemEditorFactory>
 
 #include <Ology/HasNameDescription>
 
@@ -32,17 +33,16 @@
     }
 
 
-
-
-class QItemEditorCreatorBase;
-
 namespace Ology {
 
 class AbstractSetting : public QObject, public HasNameDescription {
     Q_OBJECT
     USE_HAS_NAME_DESCRIPTION
+    Q_PROPERTY(QVariant value READ variantValue)
 public:
-    AbstractSetting(QObject *parent = 0) : QObject(parent) {}
+    AbstractSetting(QObject *parent = 0) : QObject(parent) {
+        connect(this, SIGNAL(variantValueChanged(const QVariant&)), SIGNAL(valueChanged()));
+    }
     AbstractSetting(const QString &root, const QString &id, const QVariant & defaultValue, 
                     const char* trContext = 0, const char*name = 0, const char *desc = 0, QObject *parent = 0) : 
         QObject(parent),
@@ -51,6 +51,7 @@ public:
         _id(id),
         _defaultValue(defaultValue)
     {
+        connect(this, SIGNAL(variantValueChanged(const QVariant&)), SIGNAL(valueChanged()));
     }
 
     QString root() const { return _root; }
@@ -77,6 +78,7 @@ public:
 
 signals:
     void variantValueChanged(const QVariant &newValue);
+    void valueChanged();
 
 private:
     QString _root;
@@ -140,9 +142,9 @@ QWidget* Setting<T>::createEditor( QWidget * parent ) {
         }
 
         return cb;
+    } else {
+        return QItemEditorFactory::defaultFactory()->createEditor((QVariant::Type)qMetaTypeId<T>(), parent);
     }
-
-    return NULL;
 }
 
 template<class T>
@@ -160,6 +162,9 @@ bool Setting<T>::takeValueFromEditor(QWidget *editor) {
             setValue( v.value<T>() );
             return true;
         }
+    } else {
+        setVariantValue( editor->property(QItemEditorFactory::defaultFactory()->valuePropertyName((QVariant::Type)metaTypeId)) );
+        return true;
     }
 
     return false;

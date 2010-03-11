@@ -10,8 +10,6 @@
 
 namespace Ology {
 namespace SettingsEditor {
-    class AbstractScreen;
-   
 
 class Manager : public QApplication, public ManagerInterface {
     Q_OBJECT
@@ -23,7 +21,10 @@ public:
     virtual QWidget* screenParent() const { return const_cast<Window*>(&_window); }
     virtual void displayScreen(const QString &id) { qWarning() << "SettingsEditor trying to display screen:" << id; }
     virtual void closeCurrentScreen() { qWarning() << "SettingsEditor trying to close current screen"; }
-   
+
+    Core::PseudoPluginInterface* pseudoPlugin() { return _pseudoPlugin; }
+
+
 private:
     Plugin::Manager _pluginManager;
     Window _window;

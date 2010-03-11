@@ -16,9 +16,13 @@ WorkDispatcher::WorkDispatcher() :
 
     _nullTimer.setInterval(0);
     _nullTimer.setSingleShot(true);
-    connect(&_nullTimer, SIGNAL(timeout()), SLOT(doWork()));
+    connect(&_nullTimer, SIGNAL(timeout()), SLOT(dispatchWork()));
 }
 
+void WorkDispatcher::addSearchWorker(FileDetector::SearchWorker* worker) {
+    _jobQueue.append(worker);
+    _nullTimer.start();
+}
 
 
 void WorkDispatcher::dispatchWork() {

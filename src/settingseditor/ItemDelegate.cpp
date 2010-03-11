@@ -20,6 +20,7 @@ QWidget * ItemDelegate::createEditor( QWidget * parent, const QStyleOptionViewIt
         //w->installEventFilter(this);
         if (w) { return w; }
         // else fall through ...
+        qDebug() << "has no special editor";
     }
 
 

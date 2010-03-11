@@ -99,13 +99,6 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="_autoLoadPlugins">
-          <property name="text">
-           <string>Auto-load all plugins found</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QWidget" name="widget" native="true">
           <layout class="QVBoxLayout" name="verticalLayout">
            <property name="margin">
@@ -236,22 +229,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>_autoLoadPlugins</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>SettingsEditor</receiver>
-   <slot>onPluginAutoLoadChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>147</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>289</x>
-     <y>30</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>_addPluginButton</sender>
    <signal>clicked()</signal>
    <receiver>SettingsEditor</receiver>
@@ -280,38 +257,6 @@
     <hint type="destinationlabel">
      <x>660</x>
      <y>576</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_autoLoadPlugins</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>_removePluginButton</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>512</x>
-     <y>146</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>626</x>
-     <y>530</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_autoLoadPlugins</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>_addPluginButton</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>585</x>
-     <y>145</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>742</x>
-     <y>537</y>
     </hint>
    </hints>
   </connection>

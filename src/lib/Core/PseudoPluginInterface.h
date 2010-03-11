@@ -26,10 +26,15 @@ public:
     virtual ~PseudoPluginInterface() {}
 
     Setting<CloseMainScreenOption> * closeMainScreenOptionSetting() { return &_closeMainScreenOption; }
+    Setting<bool>* autoLoadPlugins() { return &_autoLoadPlugins; }
 
 private:
     QList<AbstractAction*> _actions;
     Setting<CloseMainScreenOption> _closeMainScreenOption;
+    Setting<bool> _autoLoadPlugins;
+
+
+
 
 // Plugin::InfoInterface
 public:

@@ -19,6 +19,10 @@ namespace FileDetector {
  * Each mimetype can end in "*", appropriate globbing will be applied.
  */
 struct FileType {
+    FileType(const QString &suffixParameter) : suffix(suffixParameter) {}
+    FileType(const QStringList &mimeTypesParameter) : mimeTypes(mimeTypesParameter) {}
+    FileType(const QString &suffixParameter, const QStringList &mimeTypesParameter) : suffix(suffixParameter), mimeTypes(mimeTypesParameter) {}
+
     QString suffix;
     QStringList mimeTypes;
     bool operator==(const FileType & ei) {

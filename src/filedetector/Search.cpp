@@ -1,12 +1,11 @@
 #include "Search.h"
 #include "SearchWorker.h"
-#include "Interface.h"
 #include "WorkerThreadController.h"
 
 namespace FileDetector {
 
-Search::Search(const SearchParameters & parameters, Interface *interface) :
-    QObject(interface),
+Search::Search(const SearchParameters & parameters, QObject *parent) :
+    QObject(parent),
     _parameters(parameters)
 {
     // clean up extensions (make sure none start with "." or "*.")
@@ -30,7 +29,6 @@ Search::Search(const Search* search) :
 
 QString Search::errorString(Error code) {
     switch(code) {
-        case ErrorNonInterfaceParent: return tr("Search parent object is not the FileDetector::Interface");
         case ErrorWorkerThreadNotRunning: return tr("FileDetector worker thread is not running");
         case ErrorAddingSearchToWorkerThread: return tr("Error adding the search request to the worker thread");
     }
@@ -39,14 +37,8 @@ QString Search::errorString(Error code) {
 }
 
 
-void Search::startOneTimeSearch() {
-    Interface *interface = qobject_cast<Interface*>(parent());
-    if (!interface) {
-        emit searchError(ErrorNonInterfaceParent);
-        return;
-    }
-
-    interface->_threadController->addSearchWorker(new SearchWorker(this));
+void Search::startOneTimeSearch(WorkerThreadController *threadController) {
+    threadController->addSearchWorker(new SearchWorker(this, threadController));
 }
 
 void Search::startContinuousSearch() {

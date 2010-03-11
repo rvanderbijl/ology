@@ -1,20 +1,23 @@
 #include "SearchWorker.h"
+#include "WorkerThreadController.h"
 
 namespace FileDetector {
 
-SearchWorker::SearchWorker(const Search * search) :
+SearchWorker::SearchWorker(const Search * search, WorkerThreadController *c) :
     Search(search),
+    _threadController(c),
     _started(false)
 {
+    qRegisterMetaType<FileDetector::SearchWorker*>("FileDetector::SearchWorker*");
     // pass through the worker signals to the "real" search object's signals
-    connect(this, SIGNAL(searchError(FileDetector::Search::Error);), search, SIGNAL(searchError(FileDetector::Search::Error);));
-    connect(this, SIGNAL(oneTimeSearchStarted();), search, SIGNAL(oneTimeSearchStarted();));
-    connect(this, SIGNAL(oneTimeSearchCompleted();), search, SIGNAL(oneTimeSearchCompleted();));
-    connect(this, SIGNAL(continuousSearchStarted();), search, SIGNAL(continuousSearchStarted();));
-    connect(this, SIGNAL(continuousSearchVerified();), search, SIGNAL(continuousSearchVerified();));
-    connect(this, SIGNAL(progress(int, int);), search, SIGNAL(progress(int, int);));
-    connect(this, SIGNAL(filesAdded(const QString &, const QList<QUrl> &);), search, SIGNAL(filesAdded(const QString &, const QList<QUrl> &);));
-    connect(this, SIGNAL(filesRemoved(const QString &, const QList<QUrl> &);), search, SIGNAL(filesRemoved(const QString &, const QList<QUrl> &);));
+    connect(this, SIGNAL(searchError(FileDetector::Search::Error)), search, SIGNAL(searchError(FileDetector::Search::Error)));
+    connect(this, SIGNAL(oneTimeSearchStarted()), search, SIGNAL(oneTimeSearchStarted()));
+    connect(this, SIGNAL(oneTimeSearchCompleted()), search, SIGNAL(oneTimeSearchCompleted()));
+    connect(this, SIGNAL(continuousSearchStarted()), search, SIGNAL(continuousSearchStarted()));
+    connect(this, SIGNAL(continuousSearchVerified()), search, SIGNAL(continuousSearchVerified()));
+    connect(this, SIGNAL(progress(int, int)), search, SIGNAL(progress(int, int)));
+    connect(this, SIGNAL(filesAdded(const QList<QUrl> &)), search, SIGNAL(filesAdded(const QList<QUrl> &)));
+    connect(this, SIGNAL(filesRemoved(const QList<QUrl> &)), search, SIGNAL(filesRemoved(const QList<QUrl> &)));
 }
 
 
@@ -76,7 +79,7 @@ void SearchWorker::work() {
         if (fileType.mimeTypes.count()) {
             // only determine mime-type of file once
             if (mimeType.isEmpty()) {
-                mimeType = QString(magic_file(_magicCookie, fi.absoluteFilePath().toAscii()));
+                mimeType = QString(magic_file(_threadController->magicCookie(), fi.absoluteFilePath().toAscii()));
                 if (mimeType.isEmpty()) { mimeType = "unknown"; }
             }
 
@@ -87,6 +90,7 @@ void SearchWorker::work() {
 
         // okay, passes all tests for this searchKey. Only needs to match one key
         _found.append( QUrl("file://" + fi.absoluteFilePath()) );
+        emit filesAdded( QList<QUrl>() << QUrl("file://" + fi.absoluteFilePath()) );
         return;
     }
 

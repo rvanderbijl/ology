@@ -1,3 +1,5 @@
+#include <QDebug>
+
 #include "WorkDispatcher.h"
 #include "WorkerThreadController.h"
 #include "SearchWorker.h"
@@ -6,10 +8,19 @@ namespace FileDetector {
 
 WorkerThreadController::WorkerThreadController(QObject *parent) : 
     QThread(parent),
+    _magicCookie(0),
     _dispatcher(NULL)
-{}
+{
+    qRegisterMetaType< QList<QUrl> >("QList<QUrl>");
+
+    _magicCookie = magic_open(MAGIC_MIME|MAGIC_PRESERVE_ATIME);
+    if (0 != magic_load(_magicCookie, NULL)) { // load default database 
+        qWarning() << "Error loading magic:" << magic_error(_magicCookie);
+    }
+}
 
 WorkerThreadController::~WorkerThreadController() {
+    magic_close(_magicCookie);
     if (isRunning()) {
         quit();
         wait(); 

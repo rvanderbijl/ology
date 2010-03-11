@@ -17,6 +17,8 @@
 
 #include "SettingsEditor.h"
 #include "TreeWidget.h"
+#include "Manager.h"
+#include "../lib/Core/PseudoPluginInterface.h"
 
 
 namespace Ology {
@@ -29,10 +31,13 @@ Window::Window() :
     setupUi(this);
     _pluginTree->setEditableColumn(2);
     _tabWidget->setCurrentIndex(0);
+
+    Manager *m = qobject_cast<Manager*>(qApp);
+    connect(m->pseudoPlugin()->autoLoadPlugins(), SIGNAL(valueChanged()), SLOT(reloadPlugins()), Qt::QueuedConnection);
 }
 
 void Window::fillInValues() {
-    _autoLoadPlugins->setChecked( _settings.value("plugins/auto-load").toBool() );
+    //_autoLoadPlugins->setChecked( _settings.value("plugins/auto-load").toBool() );
     _pluginDirectory->setText( _settings.value("plugins/search-directory").toString() );
 }
 
@@ -120,7 +125,10 @@ void Window::createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInte
 QStringList Window::specifiedPlugins() {
     QStringList specifiedPlugins;
     for(int i = 0; i < _pluginTree->topLevelItemCount(); i++) {
-        specifiedPlugins << _pluginTree->topLevelItem(i)->text(0);
+        const QString name = _pluginTree->topLevelItem(i)->text(0);
+        if (name != "Internal") {
+            specifiedPlugins << name;
+        }
     }
     return specifiedPlugins;
 }
@@ -128,7 +136,18 @@ QStringList Window::specifiedPlugins() {
 void Window::reloadPlugins() {
     QStringList specifiedPlugins;
     OLOGY()->pluginManager()->unloadPlugins();
-    if (_autoLoadPlugins->isChecked()) {
+
+
+
+    Manager *m = qobject_cast<Manager*>(qApp);
+    const bool autoLoad = m->pseudoPlugin()->autoLoadPlugins()->variantValue().toBool();
+
+    qDebug() << "Reload: auto=" << autoLoad;
+
+    _addPluginButton->setEnabled(!autoLoad);
+    _removePluginButton->setEnabled(!autoLoad);
+
+    if (autoLoad) {
         OLOGY()->pluginManager()->autoLoadPlugins( Ology::Introspection );
     } else {
         specifiedPlugins = this->specifiedPlugins();
@@ -188,11 +207,6 @@ void Window::onPluginDirectoryBrowse() {
     if (!directory.isEmpty()) { 
         _pluginDirectory->setText(directory);
     }
-}
-
-void Window::onPluginAutoLoadChanged() {
-    _settings.setValue("plugins/auto-load", _autoLoadPlugins->isChecked());
-    reloadPlugins();
 }
 
 void Window::onPluginDirectoryChanged(const QString &dir) {

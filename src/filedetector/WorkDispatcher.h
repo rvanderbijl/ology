@@ -25,10 +25,9 @@ class WorkDispatcher : public QObject {
 public:
     WorkDispatcher();
 
-    Q_INVOKABLE void addSearchWorker(FileDetector::SearchWorker* worker);
-
 public slots:
     void dispatchWork();
+    void addSearchWorker(FileDetector::SearchWorker* worker);
 
 private:
     magic_t _magicCookie;

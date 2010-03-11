@@ -2,14 +2,17 @@
 #define FILEDETECTOR_SEARCH_WORKER
 
 #include <QObject>
+#include <QMetaType>
 #include "SearchParameters.h"
 #include "Search.h"
 
 namespace FileDetector {
+    class WorkerThreadController;
 
 class SearchWorker : public Search {
+    Q_OBJECT
 public:
-    SearchWorker(const Search * search);
+    SearchWorker(const Search * search, WorkerThreadController *controller);
 
 public:
     // make this public accessile 
@@ -23,6 +26,7 @@ signals:
     void searchCompleted();
 
 private:
+    WorkerThreadController *_threadController;
     bool _started;
     QStringList _suffixes;
     QList<QUrl> _found;
@@ -33,5 +37,7 @@ private:
 
 
 }
+
+Q_DECLARE_METATYPE(FileDetector::SearchWorker*);
 
 #endif

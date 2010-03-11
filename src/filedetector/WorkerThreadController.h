@@ -3,6 +3,10 @@
 
 #include <QThread>
 
+extern "C" {
+#include <magic.h>
+}
+
 namespace FileDetector {
 class SearchWorker;
 class WorkDispatcher;
@@ -14,11 +18,13 @@ public:
     ~WorkerThreadController();
 
     void addSearchWorker(SearchWorker *searchWorker);
+    magic_t magicCookie() { return _magicCookie; }
 
 protected:
     virtual void run();
 
 private:
+    magic_t _magicCookie;
     WorkDispatcher *_dispatcher;
 };
 

@@ -17,13 +17,18 @@ Manager::Manager(int &argc, char** argv) :
     setOrganizationName("ology.org");
     setApplicationName("ology");
     addLibraryPath(".");
-    _pluginManager.loadPlugins( Ology::RealUsage, QStringList() << "libmenus.so" );
+
+    if (_pseudoPlugin->autoLoadPlugins()->value()) {
+        _pluginManager.autoLoadPlugins(Ology::RealUsage);
+    } else {
+        _pluginManager.loadPlugins( Ology::RealUsage, QStringList() << "libmenus.so" );
+    }
     _pluginManager.registerScreens(OLOGY()->coreInstance());
 
 
     foreach(Plugin::ScreenInterface *si, _pluginManager.screenPlugins()) {
         foreach(AbstractAction *action, si->globalActions()) {
-            qDebug() << "adding action: " << action->name();
+            qDebug() << "Adding action:" << action->name();
             _window.addAction(action);
         }
     }

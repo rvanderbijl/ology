@@ -39,4 +39,5 @@ QString AbstractSetting::displayValue() const {
 
 
 
+
 }

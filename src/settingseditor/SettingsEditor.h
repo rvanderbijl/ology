@@ -30,14 +30,13 @@ public:
 
 
     QStringList specifiedPlugins();
-    void reloadPlugins();
     void updatedLoadedPlugins(const QStringList & specifiedPlugins);
 
 // plugin settings
 public slots:
+    void reloadPlugins();
     void onPluginDirectoryBrowse();
     void onPluginDirectoryChanged(const QString &dir);
-    void onPluginAutoLoadChanged();
     void onPluginAdd();
     void onPluginRemove();
 

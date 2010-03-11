@@ -4,7 +4,7 @@ TARGET=Ology
 TEMPLATE=lib
 
 # support classes
-HEADERS += AbstractScreen.h AbstractAction.h  SimpleScreenAction.h
+HEADERS += AbstractScreen.h AbstractAction.h  SimpleAction.h SimpleScreenAction.h
 HEADERS += ManagerInterface.h   Setting.h    HasNameDescription.h HasSettings.h HasErrorString.h 
 SOURCES += ManagerInterface.cpp Setting.cpp  
 

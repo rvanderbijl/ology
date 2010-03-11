@@ -11,12 +11,15 @@ namespace Core {
 
 PseudoPluginInterface::PseudoPluginInterface() :
     _closeMainScreenOption(tr("core"), tr("close-main-screen-result"), ConfirmQuit,
-                           metaObject()->className(), "Close main screen result", "The result of closing the main screen", this)
+                           metaObject()->className(), "Close main screen result", "The result of closing the main screen", this),
+    _autoLoadPlugins(tr("core"), tr("autoload-plugins"), true,
+                           metaObject()->className(), "Autoload plugins", "Automatically load all plugins that can be found", this)
 {
 
     qRegisterMetaTypeStreamOperators<Ology::Core::PseudoPluginInterface::CloseMainScreenOption>("Ology::Core::PseudoPluginInterface::CloseMainScreenOption");
 
     registerSetting(&_closeMainScreenOption);
+    registerSetting(&_autoLoadPlugins);
 
 
     AbstractAction *action = NULL;

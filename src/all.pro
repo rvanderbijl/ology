@@ -2,5 +2,5 @@ CONFIG += ordered
 
 TEMPLATE=subdirs
 
-SUBDIRS += lib frontend settingseditor
-SUBDIRS += plugins/menus
+SUBDIRS += filedetector lib frontend settingseditor
+SUBDIRS += plugins/menus plugins/music-phonon
