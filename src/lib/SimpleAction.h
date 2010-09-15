@@ -11,8 +11,8 @@ class SimpleAction : public AbstractAction {
     Q_OBJECT
     USE_HAS_NAME_DESCRIPTION 
 public:
-    SimpleAction(const char *name, const char *description, QObject *parent) : 
-        AbstractAction(parent)
+    SimpleAction(const QString &id, const char *name, const char *description, QObject *parent) : 
+        AbstractAction(id, ScreenSpecificAction, parent)
     {
         setTranslationContext(parent->metaObject()->className());
         setUntranslatedName(name);

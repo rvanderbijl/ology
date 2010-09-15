@@ -1,4 +1,4 @@
-#include <Ology/Plugin/ScreenInterface>
+#include <Ology/Plugin/ScreenProviderInterface>
 #include <Ology/AbstractScreen>
 #include <Ology/Core/CloseScreenAction>
 #include "../lib/Core/PseudoPluginInterface.h"
@@ -26,7 +26,7 @@ Manager::Manager(int &argc, char** argv) :
     _pluginManager.registerScreens(OLOGY()->coreInstance());
 
 
-    foreach(Plugin::ScreenInterface *si, _pluginManager.screenPlugins()) {
+    foreach(Plugin::ScreenProviderInterface *si, _pluginManager.screenProviderPlugins()) {
         foreach(AbstractAction *action, si->globalActions()) {
             qDebug() << "Adding action:" << action->name();
             _window.addAction(action);
@@ -80,7 +80,7 @@ void Manager::closeCurrentScreen() {
     if (_screens.size() <= 1) { 
         Core::PseudoPluginInterface::CloseMainScreenOption option = _pseudoPlugin->closeMainScreenOptionSetting()->value();
         if (option == Core::PseudoPluginInterface::Quit) { qApp->quit(); }
-        else if (option == Core::PseudoPluginInterface::ConfirmQuit) { displayScreen(ID_SCREEN_CONFIRM_QUIT); }
+        else if (option == Core::PseudoPluginInterface::ConfirmQuit) { displayScreen(Id::Screen::ConfirmQuit); }
         return;
     }
     screen = _screens.pop();

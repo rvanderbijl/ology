@@ -1,7 +1,8 @@
 #include "ManagerInterface.h"
 
+#include "Plugin/Manager.h"
 #include "Plugin/InfoInterface.h"
-#include "Plugin/ScreenInterface.h"
+#include "Plugin/ScreenProviderInterface.h"
 
 #include "Core/PseudoPluginInterface.h"
 
@@ -19,14 +20,27 @@ ManagerInterface::ManagerInterface() :
 {
     _pseudoPlugin = new Core::PseudoPluginInterface();
     _coreInfoInterface = qobject_cast<Plugin::InfoInterface*>(_pseudoPlugin);
-    _coreScreenInterface = qobject_cast<Plugin::ScreenInterface*>(_pseudoPlugin);
+    _coreScreenProviderInterface = qobject_cast<Plugin::ScreenProviderInterface*>(_pseudoPlugin);
 }
 
 ManagerInterface::~ManagerInterface() {
     delete _pseudoPlugin;
     _pseudoPlugin = NULL;
     _coreInfoInterface = NULL;
-    _coreScreenInterface = NULL;
+    _coreScreenProviderInterface = NULL;
 }
+
+AbstractAction* ManagerInterface::action(const QString &id) const {
+    AbstractAction* action = _coreScreenProviderInterface->action(id);
+    if (action) { return action; }
+
+    foreach(Plugin::ScreenProviderInterface* screenProviderInterface, pluginManager()->screenProviderPlugins()) {
+        AbstractAction* action = screenProviderInterface->action(id);
+        if (action) { return action; }
+    }
+
+    return NULL;
+}
+
 
 }

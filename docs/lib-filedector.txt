@@ -1,0 +1,80 @@
+libFileDector:
+
+I couldn't find a simply library for finding and tracking audio files and
+playlists.  This was surprising because its such a commont task.  But perhaps
+its too common/easy that people never thought to make a library for it. 
+
+The same functionality is needed by a video playlist.
+
+
+FileDector:
+- can search by file extension or by mime-type or combination
+- uses libmagic for mime-type detection
+- user creates search "key"s. These are unique sets of files which specific criteria:
+    - file extension,
+    - mime-type,
+    - read and/or writable
+- search key without file extension causes it to examine each file for a mime-type (can be a lot slower!)
+
+- can search any directory (optionally recursively) for one or more search-keys
+- can monitor any directory (optionally recursively) for one or more search-keys
+- stores the search keys, monitored directories, list of found files in an SQLITE database 
+- when starting, reloads the files, playlists and monitored directories from the SQLITE database
+- supports a verify function, to verify the files (list loaded from SQLITE) still exist
+- functionality is asynchronous
+
+
+
+namespace FileTypeDetector {
+    struct DirectoryMonitor {
+        QDir dir;
+        bool recursive;
+        QStringList keys;
+        SearchCriteria searchCriteria;
+    };
+
+    struct SearchKey {
+        QString key;
+        QStringList fileExtensions;
+        QStringList mimeTypes;
+        FileCriteria extraCriteria;
+    };
+
+
+    class Interface {
+        enum FileCriteria { Readable, Writable }
+        enum VerifyCriteria { VerifyExistance, VerifyFileCriteria, VerifyMimeType }
+        enum SearchCriteria { FollowSymLinks }
+
+        Interface(QObject *parent);
+
+        void setStorageFile(...);
+
+        void addSearchKey(SearchKey key); 
+        void addSearchKey(const QString name, ;
+        void removeSearchKey(const QString name);
+
+        QList<SearchKey> searchKeys();
+        QList<DirectoryMonitor> monitoredDirectories();
+
+        QList<QUrl> files(const QString &key)
+
+    slots:
+        void verifyFiles(const QString &key, SearchCriteria );
+
+        void addAudioFile(const QUrl &url);
+        void addAudioFiles(const QList<QUrl> &urls);
+
+        void searchDirectory( const QDir &dir, bool recursive, const QStringList() &keys );
+        void addMonitorDirectory(const QDir &dir, bool recursive, const QStringList();
+        void removeMonitorDirectory(const QDir &dir);
+
+
+    signals:
+        void verifyCompleted();
+        void searchDirectoryCompleted(const QDir &dir, const QSet<QUrl> &audioFilesFound);
+        void newAudioFiles(const QSet<QUrl> &newFiles);
+        void removedAudioFiles(const QSet<QUrl> &removedFiles);
+    };
+}
+

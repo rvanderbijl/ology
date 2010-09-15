@@ -3,7 +3,7 @@ CONFIG += debug rtti
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD $$PWD/lib $$PWD/include $$PWD/include/Ology/ $$PWD/include/Ology/Core
 
-!contains(TARGET,OlogyLib) {
+!contains(TARGET,OlogyLib):!contains(TARGET,FileDetector) {
     LIBS += -L$$PWD -lOlogy
 }
 

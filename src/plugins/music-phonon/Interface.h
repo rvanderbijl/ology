@@ -3,12 +3,18 @@
 
 #include <QObject>
 #include <QUrl>
-#include <Ology/Plugin/ScreenInterface>
+#include <Ology/Setting>
+#include <Ology/Plugin/ScreenProviderInterface>
+#include <Ology/Plugin/PlayerInterface>
 #include <Ology/Plugin/InfoInterface>
 
 #include <FileDetector/WorkerThreadController>
 
 #include <Phonon/MediaObject>
+
+#include "MusicUrl.h"
+#include "PlayHistory.h"
+#include "PlayList.h"
 
 namespace Ology {
 namespace Plugin {
@@ -17,12 +23,19 @@ namespace MusicPhonon {
 class Interface : 
     public QObject,
     public Ology::Plugin::InfoInterface,
-    public Ology::Plugin::ScreenInterface 
+    public Ology::Plugin::PlayerInterface,
+    public Ology::Plugin::ScreenProviderInterface
 {
     Q_OBJECT
-    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenInterface)
+    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface Ology::Plugin::PlayerInterface)
+
 public:
-    Interface() : _mediaPlayer(NULL), _fileDetectorController(NULL) {}
+    enum Shuffle { NoShuffle, RandomShuffle };
+    enum Repeat { RepeatNone, RepeatAll };
+    Q_ENUMS(Shuffle Repeat)
+
+public:
+    Interface();
 
     virtual QString name() const { return "Music-Phonon"; }
     virtual QString version() const { return "0.1"; }
@@ -33,19 +46,41 @@ public:
     virtual AbstractScreen* createScreen(const QString &id, QWidget *parent);
     virtual QList<AbstractAction*> globalActions();
 
-private slots:
-    void filesFound(const QList<QUrl>& files);
+    Phonon::MediaObject* mediaPlayer() { return _mediaPlayer; }
 
-    void nextSong();
-    void previousSong();
+signals:
+    void currentPlayListEntryChanged(const QUrl &url);
+
+public slots:
+    virtual void play();
+    virtual void stop();
+    virtual void next();
+    virtual void prev();
+
+private slots:
+    void onFileDetectorThreadReady();
+    void onFilesFound(const QList<QUrl>& files);
+
+
+    int getNextSongIndex();
 
 private:
     Phonon::MediaObject *_mediaPlayer;
     FileDetector::WorkerThreadController *_fileDetectorController;
-    QList<QUrl> _files;
+
+    Setting<Shuffle> _shuffleSetting;
+    Setting<Repeat> _repeatSetting;
+
+    QList<MusicUrl> _allMusic;
+
+    PlayList _currentPlayList;
+    PlayHistory _history;
 };
 
 
 }}}
+
+Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Interface::Shuffle);
+Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Interface::Repeat);
 
 #endif

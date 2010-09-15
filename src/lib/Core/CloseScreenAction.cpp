@@ -6,7 +6,7 @@ namespace Ology {
 namespace Core {
 
 CloseScreenAction::CloseScreenAction(QObject *parent) :
-    AbstractAction(parent)
+    AbstractAction(Id::Action::CloseScreen, GlobalAction, parent)
 {
     setTranslationContext(metaObject()->className());
     setUntranslatedName("Close Screen");

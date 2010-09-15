@@ -5,6 +5,7 @@
 namespace Ology {
 namespace Core {
 
+/*
 DisplayScreenAction::DisplayScreenAction(QObject *parent) :
     AbstractAction(parent)
 {
@@ -12,9 +13,10 @@ DisplayScreenAction::DisplayScreenAction(QObject *parent) :
     setUntranslatedName("Display Screen");
     setUntranslatedDescription("Display a screen by it's screen-id");
 }
+*/
 
 DisplayScreenAction::DisplayScreenAction(const QString &screenId, QObject *parent) :
-    AbstractAction(parent),
+    AbstractAction("global-action-display-screen-"+screenId, GlobalAction, parent),
     _screenId(screenId)
 {
     setText(tr("Display Screen: %1").arg(screenId));

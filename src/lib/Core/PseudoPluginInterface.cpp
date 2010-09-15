@@ -4,6 +4,14 @@
 #include "Core/CloseScreenAction.h"
 #include "Core/QuitAction.h"
 #include "Core/ConfirmQuitScreen.h"
+#include "Core/PageUpAction.h"
+#include "Core/PageDownAction.h"
+#include "Core/UpAction.h"
+#include "Core/DownAction.h"
+#include "Core/LeftAction.h"
+#include "Core/RightAction.h"
+#include "Core/FirstAction.h"
+#include "Core/LastAction.h"
 
 
 namespace Ology {
@@ -21,27 +29,32 @@ PseudoPluginInterface::PseudoPluginInterface() :
     registerSetting(&_closeMainScreenOption);
     registerSetting(&_autoLoadPlugins);
 
-
-    AbstractAction *action = NULL;
+    #define ADD_ACTION(class, shortcut) { \
+        class *action = new class(this); \
+        action->setShortcut(shortcut); \
+        _actions << action; \
+    }
     
-    action = new Core::CloseScreenAction(this);
-    action->setShortcut(Qt::Key_Escape);
-    _actions << action;
-
-    action = new Core::QuitAction(this);
-    action->setShortcut(QKeySequence("Ctrl+Q"));
-
-    _actions << action;
+    ADD_ACTION(Core::CloseScreenAction, Qt::Key_Escape);
+    ADD_ACTION(Core::QuitAction, QKeySequence("Ctrl+Q"));
+    ADD_ACTION(Core::PageUpAction, Qt::Key_PageUp);
+    ADD_ACTION(Core::PageDownAction, Qt::Key_PageDown);
+    ADD_ACTION(Core::UpAction, Qt::Key_Up);
+    ADD_ACTION(Core::DownAction, Qt::Key_Down);
+    ADD_ACTION(Core::LeftAction, Qt::Key_Left);
+    ADD_ACTION(Core::RightAction, Qt::Key_Right);
+    ADD_ACTION(Core::FirstAction, Qt::Key_Home);
+    ADD_ACTION(Core::LastAction, Qt::Key_End);
 }
 
 QStringList PseudoPluginInterface::screenIds() {
     return QStringList() 
-        << ID_SCREEN_CONFIRM_QUIT
+        << Id::Screen::ConfirmQuit
         ;
 }
 
 AbstractScreen* PseudoPluginInterface::createScreen(const QString &id, QWidget *parent) { 
-    if (id == ID_SCREEN_CONFIRM_QUIT) { return new Core::ConfirmQuitScreen(parent); }
+    if (id == Id::Screen::ConfirmQuit) { return new Core::ConfirmQuitScreen(parent); }
     return NULL; 
 }
 

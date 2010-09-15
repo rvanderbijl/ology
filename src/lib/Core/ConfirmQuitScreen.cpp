@@ -1,10 +1,9 @@
 #include <QDebug>
-#include <Ology/AbstractAction>
-#include <Ology/ManagerInterface>
-
 #include <QPushButton>
 #include <QBoxLayout>
 
+#include <Ology/AbstractAction>
+#include <Ology/ManagerInterface>
 #include "ConfirmQuitScreen.h"
 #include "../SimpleScreenAction.h"
 
@@ -22,8 +21,8 @@ ConfirmQuitScreen::ConfirmQuitScreen(QWidget *parent) :
 
 
 bool ConfirmQuitScreen::initialize(Ology::InitializePurpose initPurpose) {
-    SimpleScreenAction *quitAction   = new SimpleScreenAction("Quit", "Actually quit Ology", this);
-    SimpleScreenAction *cancelAction = new SimpleScreenAction("Cancel", "Don't quit Ology", this);
+    SimpleScreenAction *quitAction   = new SimpleScreenAction("action-quit", "Quit", "Actually quit Ology", this);
+    SimpleScreenAction *cancelAction = new SimpleScreenAction("action-cancel", "Cancel", "Don't quit Ology", this);
     connect(quitAction, SIGNAL(triggered()), SLOT(quit()));
     connect(cancelAction, SIGNAL(triggered()), SLOT(cancel()));
 

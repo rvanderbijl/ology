@@ -1,0 +1,45 @@
+A screen is what is displayed. Examples of screens:
+- Menu screen(s)
+- Game screen
+- Video selection screen
+- video-play screen
+
+A action is something that Ology can do.  E.g.:
+- Play-music, Pause-music, Stop-music
+- Display Screen (X)
+- Cursor-movements, "Ok"/"Enter"
+Some actions, like "Display Screen" can take parameters
+
+
+
+
+
+Screens have the following attributs:
+- Name: QString: the name of this screen
+- Description: QString: the description of this screen
+- SoundUsage: enum { MergeSound, GrabSound }
+    - MergeSound: any sound played by this screen should be merged with any other sound 
+      being produced by the system
+    - GrabSound: any sound played by ology should be paused when entering this screen
+- InputUsage: enum { Normal, ScreenOnly, Strict }
+    - Normal: any actions provided by the screen or any of the "global" actions may be run
+    - ScreenOnly: typically only commmands provided by the screen can be run. 
+                  Overrides global action inputs.  Only actionss with a high-priority can be invoked 
+                  (e.g. this allows the power buttons to work, but screen get all other inputs)
+    - Strict: only actions provided by the screen can be run. 
+      Even high-priority global actions aren't run
+- State { Running, Suspended }
+    - Running: currently displayed/in-use
+    - Suspended: a child-screen is being displayed
+- Actions { a list of actions specific to this screen }
+- Settings { a list of settings that this screen supports }
+
+
+Screen life-time:
+- Screens can be created for usage, or for intraspection
+- When a screen is requested, a new instance of that screen is created. 
+- If any of its actions start a new screen, this screen is kept "suspended" until the child-screen is closed
+- A child screen can be created if a global-input starts a "display-screen" as well: 
+    - allows for: playing a game,
+                  global-input starts a action to go to playlist-selection screen
+                  going back to game from the playlist-selection screen

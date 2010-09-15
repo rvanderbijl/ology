@@ -20,17 +20,17 @@ class AbstractScreen :
 {
     Q_OBJECT
 public:
-    enum MusicUsage { MergeSound, GrabSound };
+    enum SoundUsage { MergeSound, GrabSound };
     enum InputUsage { NormalInput, OnlyScreenActionsInput, StrictOnlyScreenActionInput };
     enum ScreenState { ScreenRunning, ScreenSuspended };
 
     Q_PROPERTY(QString name READ name);
     Q_PROPERTY(QString description READ description);
     Q_PROPERTY(QString errorString READ errorString);
-    Q_PROPERTY(Ology::AbstractScreen::MusicUsage musicUsage READ musicUsage)
+    Q_PROPERTY(Ology::AbstractScreen::SoundUsage musicUsage READ musicUsage)
     Q_PROPERTY(Ology::AbstractScreen::InputUsage inputUsage READ inputUsage)
     Q_PROPERTY(Ology::AbstractScreen::ScreenState screenState READ screenState)
-    Q_ENUMS(MusicUsage InputUsage ScreenState)
+    Q_ENUMS(SoundUsage InputUsage ScreenState)
 
 public:
     /*! Construct a new AbstractScreen.
@@ -43,11 +43,11 @@ public:
      */
     ScreenState screenState() const { return _screenState; }
 
-    /*! Return the MusicUsage.
+    /*! Return the SoundUsage.
      * 
      * The default is MergeSound. Override if sound usage is different.
      */
-    virtual MusicUsage musicUsage() const { return MergeSound; }
+    virtual SoundUsage musicUsage() const { return MergeSound; }
 
     /*! Return the InputUsage.
      * 
@@ -105,7 +105,7 @@ private:
 
 };
 
-Q_DECLARE_METATYPE(Ology::AbstractScreen::MusicUsage);
+Q_DECLARE_METATYPE(Ology::AbstractScreen::SoundUsage);
 Q_DECLARE_METATYPE(Ology::AbstractScreen::InputUsage);
 Q_DECLARE_METATYPE(Ology::AbstractScreen::ScreenState);
 

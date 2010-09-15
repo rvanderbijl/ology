@@ -5,10 +5,11 @@
 class QWidget;
 
 namespace Ology {
+class AbstractAction;
 namespace Plugin { 
     class Manager; 
     class InfoInterface; 
-    class ScreenInterface; 
+    class ScreenProviderInterface; 
 }
 namespace Core {
     class PseudoPluginInterface;
@@ -25,12 +26,14 @@ public:
     virtual void closeCurrentScreen() = 0;
 
     Plugin::InfoInterface* coreInfoInterface() { return _coreInfoInterface; }
-    Plugin::ScreenInterface* coreScreenInterface() { return _coreScreenInterface; }
+    Plugin::ScreenProviderInterface* coreScreenProviderInterface() { return _coreScreenProviderInterface; }
     QObject* coreInstance() { return (QObject*)_pseudoPlugin; }
+
+    AbstractAction* action(const QString &id) const;
 
 protected:
     Plugin::InfoInterface *_coreInfoInterface;
-    Plugin::ScreenInterface *_coreScreenInterface;
+    Plugin::ScreenProviderInterface *_coreScreenProviderInterface;
     Core::PseudoPluginInterface *_pseudoPlugin;
 };
 

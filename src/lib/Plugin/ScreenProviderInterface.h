@@ -1,8 +1,9 @@
-#ifndef OLOGY_PLUGIN_SCREEN_INTERFACE
-#define OLOGY_PLUGIN_SCREEN_INTERFACE
+#ifndef OLOGY_PLUGIN_SCREEN_PROVICER_INTERFACE
+#define OLOGY_PLUGIN_SCREEN_PROVICER_INTERFACE
 
 #include <QStringList>
 #include <Ology/HasErrorString>
+#include <Ology/AbstractAction>
 
 class QWidget;
 
@@ -12,7 +13,7 @@ namespace Ology {
 
 namespace Plugin {
 
-class ScreenInterface {
+class ScreenProviderInterface {
 public:
     /*! screenNames returns the list of possible screen IDs.
      *
@@ -36,11 +37,21 @@ public:
      * This list may be empty if no global actions are provided by this plugin.
      */
     virtual QList<AbstractAction*> globalActions() = 0;
+
+
+    virtual AbstractAction* action(const QString &id) {
+        foreach(AbstractAction* action, globalActions()) {
+            if (action->id() == id) {
+                return action;
+            }
+        }
+        return NULL;
+    }
 };
 
 
 }}
 
-Q_DECLARE_INTERFACE(Ology::Plugin::ScreenInterface, "org.Ology.Plugin.ScreenInterface");
+Q_DECLARE_INTERFACE(Ology::Plugin::ScreenProviderInterface, "org.Ology.Plugin.ScreenProviderInterface");
 
 #endif

@@ -2,7 +2,7 @@
 #define OLOGY_PLUGIN_MENUS_INTERFACE
 
 #include <QObject>
-#include <Ology/Plugin/ScreenInterface>
+#include <Ology/Plugin/ScreenProviderInterface>
 #include <Ology/Plugin/InfoInterface>
 
 namespace Ology {
@@ -12,10 +12,10 @@ namespace Menus {
 class Interface : 
     public QObject,
     public Ology::Plugin::InfoInterface,
-    public Ology::Plugin::ScreenInterface 
+    public Ology::Plugin::ScreenProviderInterface 
 {
     Q_OBJECT
-    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenInterface)
+    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface)
 public:
     Interface() {}
 

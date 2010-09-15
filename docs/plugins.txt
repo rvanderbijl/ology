@@ -1,0 +1,52 @@
+
+Plugins:
+- can be created for usage, or for intraspection
+- provides a list of possible screens names
+- provides a list of global actions (instances)
+- a factory for creating screens
+- differnet interfaces:
+    ScreenInterface
+    SoundInterface
+    ThemeInterface
+
+
+
+
+TODO: create version object? plugin-interdependencies?
+
+
+
+
+Plugins:
+- lirc-input
+- keyboard-input
+- menus
+- statuswidget-time
+- statuswidget-cd
+- power { global-actions: toggle-display-power, suspend-computer }
+- language { global-actions: language-select(x) for each language we have translations for,
+             screens: language-select: allow user to select language from a list }
+- music { 
+    global-actions:
+        - music-play
+        - music-toggle-pause
+        - music-next
+        - music-prev
+        - music-ffwd
+        - music-rewind
+        - music-select-playlist(x)
+    screens:
+        - music-select-playlist (choose what playlist to play)
+        - music-modify-playlist (add/remove songs from a playlist)
+        - music-whats-playing (view what is currently playing)
+}
+- video-player {
+}
+- video-selector {
+    global-actions:
+        - video-play
+}
+
+
+
+

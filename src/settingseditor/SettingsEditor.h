@@ -26,7 +26,7 @@ public:
     void fillInValues();
 
     void createSettingsEntries(QTreeWidgetItem *parent, HasSettings* hasSetting);
-    void createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInterface* plugin);
+    void createSettingsEntries(Plugin::ScreenProviderInterface* si, Plugin::InfoInterface* plugin);
 
 
     QStringList specifiedPlugins();

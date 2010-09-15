@@ -14,7 +14,7 @@ namespace Ology {
 
 namespace Plugin {
     class InfoInterface;
-    class ScreenInterface;
+    class ScreenProviderInterface;
 
 class Manager : public QObject {
     Q_OBJECT
@@ -32,7 +32,7 @@ public:
 
     QList<QPluginLoader*>   pluginLoaders() const { return _plugins; }
     QList<InfoInterface*>   ologyPlugins() const;
-    QList<ScreenInterface*> screenPlugins() const;
+    QList<ScreenProviderInterface*> screenProviderPlugins() const;
 
     AbstractScreen* createScreen(const QString &id);
 

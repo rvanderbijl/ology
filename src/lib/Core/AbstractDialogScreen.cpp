@@ -1,10 +1,8 @@
 #include <QDebug>
-#include <Ology/AbstractAction>
-#include <Ology/ManagerInterface>
-
 #include <QPushButton>
 #include <QBoxLayout>
 
+#include <Ology/AbstractAction>
 #include "AbstractDialogScreen.h"
 #include "../SimpleScreenAction.h"
 

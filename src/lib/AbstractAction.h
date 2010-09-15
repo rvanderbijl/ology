@@ -4,6 +4,7 @@
 #include <QAction>
 #include <Ology/HasNameDescription>
 #include <Ology/HasSettings>
+#include <Ology/GlobalActionIds>
 
 namespace Ology {
 
@@ -14,19 +15,29 @@ class AbstractAction :
 {
     Q_OBJECT
     Q_PROPERTY(Ology::AbstractAction::Type type READ type)
+    Q_PROPERTY(QString id READ id)
     Q_ENUMS(Type)
 
 public:
-    enum Type { ScreenSpecific, Global, HighPriority };
-    virtual Type type() const { return ScreenSpecific; }
+    enum Type { ScreenSpecificAction, GlobalAction, HighPriorityAction };
+    virtual Type type() const { return _type; }
+    QString id() const { return _id; }
 
 public:
-    AbstractAction(QObject *parent) : QAction(parent) {
+    AbstractAction(const QString &id, Type type, QObject *parent) :
+        QAction(parent),
+        _id(id),
+        _type(type)
+    {
         QObject::connect(this, SIGNAL(triggered()), SLOT(run()));
     }
 
 public slots:
     virtual void run() = 0;
+
+private:
+    QString _id;
+    Type _type;
 };
 
 

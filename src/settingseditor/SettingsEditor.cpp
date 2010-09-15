@@ -3,7 +3,7 @@
 #include <Ology/Setting>
 #include <Ology/InitializePurpose>
 #include <Ology/Plugin/InfoInterface>
-#include <Ology/Plugin/ScreenInterface>
+#include <Ology/Plugin/ScreenProviderInterface>
 
 #include <QStringList>
 #include <QDebug>
@@ -62,7 +62,7 @@ void Window::createSettingsEntries(QTreeWidgetItem *parent, HasSettings* hasSett
 }
 
 
-void Window::createSettingsEntries(Plugin::ScreenInterface* si, Plugin::InfoInterface *ii) {
+void Window::createSettingsEntries(Plugin::ScreenProviderInterface* si, Plugin::InfoInterface *ii) {
     Q_ASSERT(ii);
     Q_ASSERT(si);
 
@@ -167,7 +167,7 @@ void Window::updatedLoadedPlugins(const QStringList & specifiedPluginsOrig) {
     QTreeWidgetItem *coreItem = new QTreeWidgetItem(_pluginTree, QStringList() << "Internal" << cii->name() << cii->version() << cii->description());
     coreItem->setIcon(0, QIcon(":icon/icon_plugin.png"));
     createSettingsEntries(coreItem, cii);
-    createSettingsEntries(OLOGY()->coreScreenInterface(), cii);
+    createSettingsEntries(OLOGY()->coreScreenProviderInterface(), cii);
 
     QStringList specifiedPlugins = specifiedPluginsOrig;
     QList<QPluginLoader*> loadedPlugins = OLOGY()->pluginManager()->pluginLoaders();
@@ -176,12 +176,12 @@ void Window::updatedLoadedPlugins(const QStringList & specifiedPluginsOrig) {
         specifiedPlugins.removeAll(fileName);
 
         Plugin::InfoInterface *ii = qobject_cast<Plugin::InfoInterface*>(loader->instance());
-        Plugin::ScreenInterface *si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());
+        Plugin::ScreenProviderInterface *si = qobject_cast<Plugin::ScreenProviderInterface*>(loader->instance());
 
         QTreeWidgetItem *item = new QTreeWidgetItem(_pluginTree, QStringList() << fileName << ii->name() << ii->version() << ii->description());
         item->setIcon(0, QIcon(":icon/icon_plugin.png"));
         if (si) {
-            QTreeWidgetItem *pluginTreeItem = new QTreeWidgetItem(item, QStringList() << "ScreenInterface implemented");
+            QTreeWidgetItem *pluginTreeItem = new QTreeWidgetItem(item, QStringList() << "ScreenProviderInterface implemented");
             pluginTreeItem->setFirstColumnSpanned(true);
         }
 

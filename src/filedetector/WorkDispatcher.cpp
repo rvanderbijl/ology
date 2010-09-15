@@ -20,6 +20,7 @@ WorkDispatcher::WorkDispatcher() :
 }
 
 void WorkDispatcher::addSearchWorker(FileDetector::SearchWorker* worker) {
+    qDebug("dispatcher added search worker");
     _jobQueue.append(worker);
     _nullTimer.start();
 }
@@ -27,15 +28,19 @@ void WorkDispatcher::addSearchWorker(FileDetector::SearchWorker* worker) {
 
 void WorkDispatcher::dispatchWork() {
     if (_currentJob) {
-        _currentJob->work();
+        if (_currentJob->work()) {
+            _nullTimer.start();
+        }
         return;
     } else {
         if (_jobQueue.isEmpty()) { 
             _nullTimer.stop(); 
             return; 
         }
+        qDebug("work dispatcher starting new job");
 
         _currentJob = _jobQueue.takeFirst();
+        _currentJob->initialize();
         _nullTimer.start();
     }
 }

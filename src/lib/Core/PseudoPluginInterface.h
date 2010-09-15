@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <Ology/Plugin/InfoInterface>
-#include <Ology/Plugin/ScreenInterface>
+#include <Ology/Plugin/ScreenProviderInterface>
 #include <Ology/Setting>
 
 namespace Ology {
@@ -12,10 +12,10 @@ namespace Core {
 class PseudoPluginInterface :
     public QObject,
     public Plugin::InfoInterface, 
-    public Plugin::ScreenInterface 
+    public Plugin::ScreenProviderInterface 
 {
     Q_OBJECT
-    Q_INTERFACES( Ology::Plugin::InfoInterface Ology::Plugin::ScreenInterface );
+    Q_INTERFACES( Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface );
     Q_ENUMS( CloseMainScreenOption )
 public:
     enum CloseMainScreenOption { Ignore, Quit, ConfirmQuit };
@@ -43,7 +43,7 @@ public:
     virtual QString description() const { return "Psuedo plugin providing core screens and actions"; }
     virtual bool initialize(Ology::InitializePurpose) { return true; }
 
-// Plugin::ScreenInterface
+// Plugin::ScreenProviderInterface
 public:
     virtual QStringList screenIds();
     virtual AbstractScreen* createScreen(const QString &id, QWidget *parent);

@@ -7,7 +7,7 @@
 #include "ManagerInterface.h"
 #include "Manager.h"
 #include "InfoInterface.h"
-#include "ScreenInterface.h"
+#include "ScreenProviderInterface.h"
 
 namespace Ology {
 namespace Plugin {
@@ -59,9 +59,9 @@ void Manager::loadPlugins(Ology::InitializePurpose purpose, const QStringList &p
 
 
         // Check Screen Interface
-        Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());
+        Plugin::ScreenProviderInterface* si = qobject_cast<Plugin::ScreenProviderInterface*>(loader->instance());
         if (si) {
-            qDebug() << "Plugin" << ii->name() << "provides ScreenInterface";
+            qDebug() << "Plugin" << ii->name() << "provides ScreenProviderInterface";
             registerScreens(loader->instance());
         }
     }
@@ -103,11 +103,11 @@ QList<Plugin::InfoInterface*> Manager::ologyPlugins() const {
     }
     return list;
 }
-QList<ScreenInterface*> Manager::screenPlugins() const {
-    QList<Plugin::ScreenInterface*> list;
-    list << OLOGY()->coreScreenInterface();
+QList<ScreenProviderInterface*> Manager::screenProviderPlugins() const {
+    QList<Plugin::ScreenProviderInterface*> list;
+    list << OLOGY()->coreScreenProviderInterface();
     foreach(QPluginLoader* loader, _plugins) {
-        Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(loader->instance());
+        Plugin::ScreenProviderInterface* si = qobject_cast<Plugin::ScreenProviderInterface*>(loader->instance());
         if (si) { list << si; }
     }
     return list;
@@ -116,7 +116,7 @@ QList<ScreenInterface*> Manager::screenPlugins() const {
 
 void Manager::registerScreens(QObject *object) {
     Plugin::InfoInterface* ii = qobject_cast<Plugin::InfoInterface*>(object);
-    Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(object);
+    Plugin::ScreenProviderInterface* si = qobject_cast<Plugin::ScreenProviderInterface*>(object);
 
     foreach(const QString &screenId, si->screenIds()) {
         if (_screenFactory.contains(screenId)) {
@@ -133,7 +133,7 @@ AbstractScreen* Manager::createScreen(const QString &id) {
         return NULL;
     }
 
-    Plugin::ScreenInterface* si = qobject_cast<Plugin::ScreenInterface*>(_screenFactory[id]);
+    Plugin::ScreenProviderInterface* si = qobject_cast<Plugin::ScreenProviderInterface*>(_screenFactory[id]);
     AbstractScreen* screen = si->createScreen(id, OLOGY()->screenParent());
     if (!screen) {
         Plugin::InfoInterface* ii = qobject_cast<Plugin::InfoInterface*>(_screenFactory[id]);

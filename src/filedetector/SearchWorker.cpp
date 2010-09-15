@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "SearchWorker.h"
 #include "WorkerThreadController.h"
 
@@ -36,28 +37,30 @@ void SearchWorker::initialize() {
 }
 
 
-void SearchWorker::work() {
+bool SearchWorker::work() {
     if (_todo.isEmpty()) {
+        qDebug("todo empty");
         emit searchCompleted();
-        return;
+        return false;
     }
 
     QFileInfo fi = _todo.takeFirst();
 
     // the file could have been removed since we first saw it
-    if (!fi.exists()) { return; }
+    if (!fi.exists()) { return true; }
 
     // if this is a directory, find all matching file-extensions
     //    (always process directories, but filter out sub-directories based on recurse- search criteria.
     //     this allows the doWork() to add a directory to the todo list to start the job)
     if (fi.isDir()) {
-        QDir dir = fi.absolutePath();
-        QDir::Filters filters = QDir::Files;
+        QDir dir = fi.absoluteFilePath(); // use file path, other we get the parent directory
+        QDir::Filters filters = QDir::Files|QDir::NoDotAndDotDot;
         if ( _parameters.searchCriteria.testFlag(FileDetector::Recursive     )) { filters |= QDir::AllDirs      ; }
         if (!_parameters.searchCriteria.testFlag(FileDetector::IgnoreCase    )) { filters |= QDir::CaseSensitive; }
         if (!_parameters.searchCriteria.testFlag(FileDetector::FollowSymLinks)) { filters |= QDir::NoSymLinks   ; }
-        _todo.append( dir.entryInfoList(_suffixes, filters) );
-        return;
+        QFileInfoList files = dir.entryInfoList(_suffixes, filters);
+        _todo.append( files );
+        return true;
     }
 
 
@@ -67,15 +70,18 @@ void SearchWorker::work() {
     QString mimeType;
 
     foreach(const FileType &fileType, _parameters.fileTypes) {
-        if (!fileType.suffix.isEmpty() || !(fileType.suffix == ext || fileType.suffix == completeExt)) {
+        //qDebug() << "File:" << fi.fileName() << ext << completeExt << "required suffix:" << fileType.suffix;
+        if (!fileType.suffix.isEmpty() && !(fileType.suffix == ext || fileType.suffix == completeExt)) {
             // doesn't match, so go to next file-type
             continue;
         }
+        //qDebug() << "matches suffix test";
 
         // if fails fileCriteria tests, it will never pass, even for other file-types
         if (_parameters.fileCriteria.testFlag(FileDetector::FileReadable)) { if (!fi.isReadable()) { break; } }
         if (_parameters.fileCriteria.testFlag(FileDetector::FileWritable)) { if (!fi.isWritable()) { break; } }
 
+        //qDebug() << "matches filecriteria  test";
         if (fileType.mimeTypes.count()) {
             // only determine mime-type of file once
             if (mimeType.isEmpty()) {
@@ -88,14 +94,17 @@ void SearchWorker::work() {
             // TODO: check globing
         }
 
+        //qDebug() << "matches mimetype test";
+
         // okay, passes all tests for this searchKey. Only needs to match one key
         _found.append( QUrl("file://" + fi.absoluteFilePath()) );
         emit filesAdded( QList<QUrl>() << QUrl("file://" + fi.absoluteFilePath()) );
-        return;
+        return true;
     }
 
     // weird, none of the keys actually match. They should if the are in the todo list.
     // But it could be because the original SearchKey was removed after the directory was listed
+    return true;
 }
 
 }

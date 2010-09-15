@@ -103,23 +103,18 @@ public:
     void setValue(const T &value) { setVariantValue(QVariant::fromValue<T>(value)); }
     void setDefaultValue(const T &defaultValue) { setDefaultVariantValue(QVariant::fromValue<T>(defaultValue)); }
 
+    T operator=(const T & v) {
+        setValue(v);
+        return v;
+    }
+
+    operator T() const {
+        return value();
+    }
+
     virtual QWidget* createEditor(QWidget *parent);
     virtual bool takeValueFromEditor(QWidget *editor);
 };
-
-/*
-template<class T>
-class EnumSettings : public Setting<T> {
-public:
-    EnumSetting(QObject *parent = 0) : Setting(parent) {}
-    EnumSetting(const QString &root, const QString &id, const T & defaultValue,
-            const char* trContext = 0, const char*name = 0, const char *desc = 0, QObject *parent = 0) : 
-        Setting(root, id, QVariant::fromValue(defaultValue), trContext, name, desc, parent) 
-    {
-    }
- 
-};
-*/
 
 
 template<class T>

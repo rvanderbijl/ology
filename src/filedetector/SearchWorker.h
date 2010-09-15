@@ -19,7 +19,7 @@ public:
     void searchError(Search::Error error) { Search::searchError(error); }
 
     void initialize();
-    void work();
+    bool work();
 
 signals:
     void searchStarted();

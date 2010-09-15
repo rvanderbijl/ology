@@ -20,6 +20,9 @@ public:
     void addSearchWorker(SearchWorker *searchWorker);
     magic_t magicCookie() { return _magicCookie; }
 
+signals:
+    void dispatcherReady();
+
 protected:
     virtual void run();
 

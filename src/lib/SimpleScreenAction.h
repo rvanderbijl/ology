@@ -11,8 +11,8 @@ namespace Ology {
 class SimpleScreenAction : public SimpleAction {
     Q_OBJECT
 public:
-    SimpleScreenAction(const char *name, const char *description, AbstractScreen *parent) : 
-        SimpleAction(name, description, parent)
+    SimpleScreenAction(const QString &id, const char *name, const char *description, AbstractScreen *parent) : 
+        SimpleAction(id, name, description, parent)
     {
         parent->registerLocalAction(this);
     }

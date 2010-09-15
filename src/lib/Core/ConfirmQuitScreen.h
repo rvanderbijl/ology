@@ -12,7 +12,7 @@ class ConfirmQuitScreen : public AbstractDialogScreen {
 public:
     ConfirmQuitScreen(QWidget *parent);
     
-    virtual QString id() const { return ID_SCREEN_CONFIRM_QUIT; }
+    virtual QString id() const { return Id::Screen::ConfirmQuit; }
     virtual QString name() const { return "Confirm Quit Screen"; }
     virtual QString description() const { return "Ask the user if they really which to quit Ology"; }
     virtual QString dialogText() const { return tr("Are you sure you wish to cancel?"); }

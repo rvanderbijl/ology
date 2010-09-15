@@ -1,0 +1,17 @@
+A action is something that Ology can do.  E.g.:
+- Play-music, Pause-music, Stop-music
+- Display Screen (X)
+- Cursor-movements, "Ok"/"Enter"
+Some actions, like "Display Screen" can take parameters
+
+
+Actions:
+- Type { ScreenSpecific, Global, HighPriority }
+- QList<Input>
+
+An input can be:
+- can be multi-key (CTRL+P)
+- sequence of keys (CTRL-X,CTRL-S)
+- a Action (e.g. if an action is invoked, then this input is also invoked)
+  (useful for having a generic action, like "left" or "right" which may not have common inputs)
+

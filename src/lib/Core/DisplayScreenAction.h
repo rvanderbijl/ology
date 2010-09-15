@@ -12,7 +12,7 @@ class DisplayScreenAction : public AbstractAction {
     Q_PROPERTY(QString screenId READ screenId WRITE setScreenId)
 
 public:
-    DisplayScreenAction(QObject *parent);
+    //DisplayScreenAction(QObject *parent);
     DisplayScreenAction(const QString &screenId, QObject *parent);
 
     virtual QString name() const { return tr("Display screen %1").arg(screenId()); }
