@@ -15,13 +15,13 @@ PlayEntry PlayList::random() {
 
 void PlayList::setCurrent(const PlayEntry &entry) {
     if (!isValid(entry)) { return; }
-    _current = entry.index();
+    _current = entry.playListIndex();
 }
 
 bool PlayList::isValid(const PlayEntry &entry) {
     if (!entry.isValid()) { return false; } // the url in the entry is valid, right?
-    if ((entry.index() < 0) || (entry.index() >= this->size())) { return false; }
-    return entry.allMusicPosition() == at(entry.index()).allMusicPosition();
+    if ((entry.playListIndex() < 0) || (entry.playListIndex() >= this->size())) { return false; }
+    return entry.masterListIndex() == at(entry.playListIndex()).masterListIndex();
 }
 
 

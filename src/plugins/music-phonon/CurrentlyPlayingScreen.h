@@ -21,12 +21,16 @@ public:
     virtual bool initialize(Ology::InitializePurpose initPurpose);
 
 private slots:
-    void onActionSongPrev();
-    void onActionSongNext();
-    void onActionSongPageUp();
-    void onActionSongPageDown();
-    void onActionSongFirst();
-    void onActionSongLast();
+    void onActionSelectSongPrev();
+    void onActionSelectSongNext();
+    void onActionSelectSongPageUp();
+    void onActionSelectSongPageDown();
+    void onActionSelectSongFirst();
+    void onActionSelectSongLast();
+
+
+    void updateCurrentSong();
+    void updateProgressBar();
 
 private:
     Interface *_interface;

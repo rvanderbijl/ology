@@ -47,10 +47,9 @@ public:
     virtual QList<AbstractAction*> globalActions();
 
     Phonon::MediaObject* mediaPlayer() { return _mediaPlayer; }
+    MusicUrl currentSong() const;
 
-signals:
-    void currentPlayListEntryChanged(const QUrl &url);
-
+// player interface:
 public slots:
     virtual void play();
     virtual void stop();
@@ -71,8 +70,7 @@ private:
     Setting<Shuffle> _shuffleSetting;
     Setting<Repeat> _repeatSetting;
 
-    QList<MusicUrl> _allMusic;
-
+    QList<MusicUrl> _masterMusicList;
     PlayList _currentPlayList;
     PlayHistory _history;
 };

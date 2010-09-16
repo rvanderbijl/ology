@@ -10,18 +10,19 @@ namespace MusicPhonon {
 
 class PlayEntry {
 public:
-    PlayEntry(int position = -1, int listIndex = -1) : _allMusicPosition(position), _index(listIndex) {}
+    PlayEntry(int masterListIndex = -1, int playListIndex = -1) : _masterListIndex(masterListIndex), _playListIndex(playListIndex) {}
 
-    int allMusicPosition() const { return _allMusicPosition; }
-    int index() const { return _index; } 
+    int masterListIndex() const { return _masterListIndex; }
+    int playListIndex() const { return _playListIndex; } 
 
-    bool isNull() const { return _allMusicPosition == -1; }
-    bool isValid() const { return _allMusicPosition != -1; }
+    bool isNull() const { return _masterListIndex == -1; }
+    bool isValid() const { return _masterListIndex != -1; }
 
 private:
-    int _allMusicPosition;
-    int _index;
+    int _masterListIndex;
+    int _playListIndex;
 };
+
 
 
 }}}

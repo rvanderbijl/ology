@@ -4,7 +4,7 @@
 #include <QAction>
 #include <Ology/HasNameDescription>
 #include <Ology/HasSettings>
-#include <Ology/GlobalActionIds>
+#include <Ology/CoreIds>
 
 namespace Ology {
 

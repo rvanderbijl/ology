@@ -24,19 +24,29 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="artistLabel">
+        <property name="text">
+         <string>Artist: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="titleLabel">
         <property name="text">
          <string>Title:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QProgressBar" name="progressBar">
+       <widget class="QProgressBar" name="songProgressBar">
         <property name="value">
-         <number>24</number>
+         <number>0</number>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
         <property name="textVisible">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="invertedAppearance">
          <bool>false</bool>

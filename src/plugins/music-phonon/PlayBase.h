@@ -19,17 +19,17 @@ template<class T>
 class PlayBase : public QList<T> {
 public:
     /*! Returns the current entry. 
-     *  If there is no current entry an empty QUrl is returned.
+     *  If there is no current entry an empty T is returned.
      */
     T current() const;
 
     /*! Move the current entry to the previous entry
-     *  If there is no next entry an empty QUrl is returned.
+     *  If there is no next entry an empty T is returned.
      */
     T previous();
 
     /*! Move the current entry to the next entry
-     *  If there is no next entry an empty QUrl is returned.
+     *  If there is no next entry an empty T is returned.
      */
     T next();
 
@@ -68,7 +68,7 @@ inline bool PlayBase<T>::hasPrevious() const {
 template<class T>
 inline bool PlayBase<T>::hasNext() const {
     CHECK_CURRENT();
-    if (this->isEmpty()) { return false; } // make sure that (this->end() - 1) is valid
+    if (this->isEmpty()) { return false; }
     return _current < (this->size() - 1);
 }
 

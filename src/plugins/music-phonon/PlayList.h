@@ -19,19 +19,19 @@ namespace MusicPhonon {
 class PlayList : public PlayBase<PlayEntry> {
 public:
     /*! Returns the current entry. 
-     *  If there is no current entry an empty QUrl is returned.
+     *  If there is no current entry a null PlayEntry is returned.
      */
-    PlayEntry current() const { return PlayEntry(PlayBase<PlayEntry>::current().allMusicPosition(), _current); }
+    PlayEntry current() const { return PlayEntry(PlayBase<PlayEntry>::current().masterListIndex(), _current); }
 
     /*! Move the current entry to the previous entry
-     *  If there is no next entry an empty QUrl is returned.
+     *  If there is no next entry a null PlayEntry is returned.
      */
-    PlayEntry previous() { return PlayEntry(PlayBase<PlayEntry>::previous().allMusicPosition(), _current); }
+    PlayEntry previous() { return PlayEntry(PlayBase<PlayEntry>::previous().masterListIndex(), _current); }
 
     /*! Move the current entry to the next entry
-     *  If there is no next entry an empty QUrl is returned.
+     *  If there is no next entry a null PlayEntry is returned.
      */
-    PlayEntry next() { return PlayEntry(PlayBase<PlayEntry>::previous().allMusicPosition(), _current); }
+    PlayEntry next() { return PlayEntry(PlayBase<PlayEntry>::previous().masterListIndex(), _current); }
 
     /*! Move the current entry to a random entry.
      *  Uses rand(). Does not seed the random number generator.

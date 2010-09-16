@@ -2,7 +2,7 @@
 #include <Ology/AbstractScreen>
 #include <Ology/Core/CloseScreenAction>
 #include "../lib/Core/PseudoPluginInterface.h"
-#include "../lib/Core/CoreIds.h"
+#include "../lib/CoreIds.h"
 
 #include <QStringList>
 #include <QDebug>

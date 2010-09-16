@@ -9,10 +9,10 @@ HEADERS += ManagerInterface.h   Setting.h    HasNameDescription.h HasSettings.h 
 SOURCES += ManagerInterface.cpp Setting.cpp  
 
 # plugins
-HEADERS += Plugin/Manager.h   Plugin/InfoInterface.h Plugin/ScreenProviderInterface.h
+HEADERS += Plugin/Manager.h   Plugin/InfoInterface.h Plugin/ScreenProviderInterface.h Plugin/PlayerInterface.h
 SOURCES += Plugin/Manager.cpp
 
-HEADERS += Core/PseudoPluginInterface.h   Core/CoreIds.h
+HEADERS += Core/PseudoPluginInterface.h   CoreIds.h
 SOURCES += Core/PseudoPluginInterface.cpp
 
 # core actions

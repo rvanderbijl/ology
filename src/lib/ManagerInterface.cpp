@@ -6,7 +6,7 @@
 
 #include "Core/PseudoPluginInterface.h"
 
-#include "Core/CoreIds.h"
+#include "CoreIds.h"
 #include "Core/CloseScreenAction.h"
 #include "Core/QuitAction.h"
 #include "Core/ConfirmQuitScreen.h"

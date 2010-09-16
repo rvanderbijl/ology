@@ -1,4 +1,6 @@
 #include <QDebug>
+#include <QFileInfo>
+#include <QTime>
 #include <QPushButton>
 #include <Ology/AbstractAction>
 #include <Ology/SimpleAction>
@@ -22,56 +24,95 @@ CurrentlyPlayingScreen::CurrentlyPlayingScreen(Interface *interface, QWidget *pa
 bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
     Q_UNUSED(initPurpose);
     setupUi(this);
+    updateProgressBar();
+    updateCurrentSong();
 
-    SimpleAction *actionSongPrev = new SimpleAction("prev", "Select Previous Song", "", this);
-    SimpleAction *actionSongNext = new SimpleAction("next", "Select Next Song", "", this);
-    SimpleAction *actionSongPageUp = new SimpleAction("page-up", "Move select a page up", "", this);
-    SimpleAction *actionSongPageDown = new SimpleAction("page-down", "Move select a page down", "", this);
-    SimpleAction *actionSongFirst = new SimpleAction("first", "Select first song", "", this);
-    SimpleAction *actionSongLast = new SimpleAction("last", "Select last song", "", this);
+    SimpleAction *actionSelectSongPrev = new SimpleAction("prev", "Select Previous Song", "", this);
+    SimpleAction *actionSelectSongNext = new SimpleAction("next", "Select Next Song", "", this);
+    SimpleAction *actionSelectSongPageUp = new SimpleAction("page-up", "Move select a page up", "", this);
+    SimpleAction *actionSelectSongPageDown = new SimpleAction("page-down", "Move select a page down", "", this);
+    SimpleAction *actionSelectSongFirst = new SimpleAction("first", "Select first song", "", this);
+    SimpleAction *actionSelectSongLast = new SimpleAction("last", "Select last song", "", this);
 
     if (initPurpose == Ology::RealUsage) {
-        connect(OLOGY()->action(Id::Action::Up), SIGNAL(triggered()), actionSongPrev, SLOT(trigger()));
-        connect(OLOGY()->action(Id::Action::Down), SIGNAL(triggered()), actionSongNext, SLOT(trigger()));
-        connect(OLOGY()->action(Id::Action::PageUp), SIGNAL(triggered()), actionSongPageUp, SLOT(trigger()));
-        connect(OLOGY()->action(Id::Action::PageDown), SIGNAL(triggered()), actionSongPageDown, SLOT(trigger()));
-        connect(OLOGY()->action(Id::Action::First), SIGNAL(triggered()), actionSongFirst, SLOT(trigger()));
-        connect(OLOGY()->action(Id::Action::Last), SIGNAL(triggered()), actionSongLast, SLOT(trigger()));
+        connect(OLOGY()->action(Id::Action::Up), SIGNAL(triggered()), actionSelectSongPrev, SLOT(trigger()));
+        connect(OLOGY()->action(Id::Action::Down), SIGNAL(triggered()), actionSelectSongNext, SLOT(trigger()));
+        connect(OLOGY()->action(Id::Action::PageUp), SIGNAL(triggered()), actionSelectSongPageUp, SLOT(trigger()));
+        connect(OLOGY()->action(Id::Action::PageDown), SIGNAL(triggered()), actionSelectSongPageDown, SLOT(trigger()));
+        connect(OLOGY()->action(Id::Action::First), SIGNAL(triggered()), actionSelectSongFirst, SLOT(trigger()));
+        connect(OLOGY()->action(Id::Action::Last), SIGNAL(triggered()), actionSelectSongLast, SLOT(trigger()));
 
-        connect(this->selectSongNextPushButton, SIGNAL(clicked()), actionSongNext, SLOT(trigger()));
-        connect(this->selectSongPrevPushButton, SIGNAL(clicked()), actionSongPrev, SLOT(trigger()));
-        connect(this->selectSongPageUpPushButton, SIGNAL(clicked()), actionSongPageUp, SLOT(trigger()));
-        connect(this->selectSongPageDownPushButton, SIGNAL(clicked()), actionSongPageDown, SLOT(trigger()));
-        connect(this->selectSongFirstPushButton, SIGNAL(clicked()), actionSongFirst, SLOT(trigger()));
-        connect(this->selectSongLastPushButton, SIGNAL(clicked()), actionSongLast, SLOT(trigger()));
+        connect(this->selectSongNextPushButton, SIGNAL(clicked()), actionSelectSongNext, SLOT(trigger()));
+        connect(this->selectSongPrevPushButton, SIGNAL(clicked()), actionSelectSongPrev, SLOT(trigger()));
+        connect(this->selectSongPageUpPushButton, SIGNAL(clicked()), actionSelectSongPageUp, SLOT(trigger()));
+        connect(this->selectSongPageDownPushButton, SIGNAL(clicked()), actionSelectSongPageDown, SLOT(trigger()));
+        connect(this->selectSongFirstPushButton, SIGNAL(clicked()), actionSelectSongFirst, SLOT(trigger()));
+        connect(this->selectSongLastPushButton, SIGNAL(clicked()), actionSelectSongLast, SLOT(trigger()));
 
-        connect(actionSongPrev,     SIGNAL(triggered()), SLOT(onActionSongPrev()));
-        connect(actionSongNext,     SIGNAL(triggered()), SLOT(onActionSongNext()));
-        connect(actionSongPageUp,   SIGNAL(triggered()), SLOT(onActionSongPageUp()));
-        connect(actionSongPageDown, SIGNAL(triggered()), SLOT(onActionSongPageDown()));
-        connect(actionSongFirst,    SIGNAL(triggered()), SLOT(onActionSongFirst()));
-        connect(actionSongLast,     SIGNAL(triggered()), SLOT(onActionSongLast()));
+        connect(actionSelectSongPrev,     SIGNAL(triggered()), SLOT(onActionSelectSongPrev()));
+        connect(actionSelectSongNext,     SIGNAL(triggered()), SLOT(onActionSelectSongNext()));
+        connect(actionSelectSongPageUp,   SIGNAL(triggered()), SLOT(onActionSelectSongPageUp()));
+        connect(actionSelectSongPageDown, SIGNAL(triggered()), SLOT(onActionSelectSongPageDown()));
+        connect(actionSelectSongFirst,    SIGNAL(triggered()), SLOT(onActionSelectSongFirst()));
+        connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
+
+        _interface->mediaPlayer()->setTickInterval(200);
+        connect(_interface->mediaPlayer(), SIGNAL(tick(qint64)), SLOT(updateProgressBar()));
+        connect(_interface->mediaPlayer(), SIGNAL(totalTimeChanged(qint64)), SLOT(updateProgressBar()));
+        connect(_interface->mediaPlayer(), SIGNAL(currentSourceChanged(const Phonon::MediaSource &)), SLOT(updateCurrentSong()));
+
+        connect(this->playPausePushButton, SIGNAL(clicked()), _interface, SLOT(play()));
+        connect(this->nextPushButton, SIGNAL(clicked()), _interface, SLOT(next()));
+        connect(this->prevPushButton, SIGNAL(clicked()), _interface, SLOT(prev()));
     }
-
-
-    connect(this->playPausePushButton, SIGNAL(clicked()), _interface, SLOT(play()));
-    connect(this->nextPushButton, SIGNAL(clicked()), _interface, SLOT(next()));
-    connect(this->prevPushButton, SIGNAL(clicked()), _interface, SLOT(prev()));
 
     return true;
 }
 
-void CurrentlyPlayingScreen::onActionSongPrev() {
+void CurrentlyPlayingScreen::onActionSelectSongPrev() {
 }
-void CurrentlyPlayingScreen::onActionSongNext() {
+void CurrentlyPlayingScreen::onActionSelectSongNext() {
 }
-void CurrentlyPlayingScreen::onActionSongPageUp() {
+void CurrentlyPlayingScreen::onActionSelectSongPageUp() {
 }
-void CurrentlyPlayingScreen::onActionSongPageDown() {
+void CurrentlyPlayingScreen::onActionSelectSongPageDown() {
 }
-void CurrentlyPlayingScreen::onActionSongFirst() {
+void CurrentlyPlayingScreen::onActionSelectSongFirst() {
 }
-void CurrentlyPlayingScreen::onActionSongLast() {
+void CurrentlyPlayingScreen::onActionSelectSongLast() {
 }
+
+
+
+void CurrentlyPlayingScreen::updateProgressBar() {
+    const int currentMs = _interface->mediaPlayer()->currentTime();
+    const int totalMs =_interface->mediaPlayer()->totalTime();
+
+    QTime current(0,0,0,0), total(0,0,0,0);
+    current = current.addMSecs(currentMs);
+    total = total.addMSecs(totalMs);
+
+    songProgressBar->setValue( currentMs );
+    songProgressBar->setMaximum( totalMs );
+
+    // TODO: if the file longer than one hour, display it correctly!
+    songProgressBar->setFormat( tr("%p% (%1 of %2)").arg(current.toString("m:ss"))
+                                                    .arg(  total.toString("m:ss")) );
+}
+
+void CurrentlyPlayingScreen::updateCurrentSong() {
+    MusicUrl musicUrl = _interface->currentSong();
+    
+    if (musicUrl.isEmpty()) {
+        artistLabel->setText(tr("Artist: %1").arg( tr("No song playing") ));
+        titleLabel->setText(tr("Title: %1").arg( tr("No song playing") ));
+    } else {
+        const QString artist = musicUrl.artist(); 
+        const QString title = musicUrl.title();
+        artistLabel->setText(tr("Artist: %1").arg(artist.isEmpty() ? tr("Artist tag missing") : artist ));
+        titleLabel->setText(tr("Title: %1").arg(title.isEmpty() ? QFileInfo(musicUrl.toLocalFile()).fileName() : title));
+    }
+}
+
 
 }}}
