@@ -109,8 +109,10 @@ void Interface::onFilesFound(const QList<QUrl>& files) {
 
 MusicUrl Interface::currentSong() const { 
     if (_history.isEmpty()) { return MusicUrl(); }
-    PlayEntry entry = _history.current();
-    return _masterMusicList[entry.masterListIndex()];
+    return song(_history.current());
+}
+MusicUrl Interface::song(const PlayEntry & entry) const {
+    return entry.isNull() ? MusicUrl() : _masterMusicList[entry.masterListIndex()];
 }
 
 void Interface::play() {

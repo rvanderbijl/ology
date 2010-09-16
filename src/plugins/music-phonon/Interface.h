@@ -48,6 +48,8 @@ public:
 
     Phonon::MediaObject* mediaPlayer() { return _mediaPlayer; }
     MusicUrl currentSong() const;
+    MusicUrl song(const PlayEntry &entry) const;
+    PlayList currentPlayList() { return _currentPlayList; }
 
 // player interface:
 public slots:

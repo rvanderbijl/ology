@@ -8,6 +8,7 @@
 
 #include "Interface.h"
 #include "CurrentlyPlayingScreen.h"
+#include "PlayListModel.h"
 
 namespace Ology {
 namespace Plugin {
@@ -57,6 +58,9 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
 
         _interface->mediaPlayer()->setTickInterval(200);
+        PlayListModel *model = new PlayListModel(_interface->currentPlayList(), _interface, this);
+        currentPlayListTreeView->setModel(model);
+
         connect(_interface->mediaPlayer(), SIGNAL(tick(qint64)), SLOT(updateProgressBar()));
         connect(_interface->mediaPlayer(), SIGNAL(totalTimeChanged(qint64)), SLOT(updateProgressBar()));
         connect(_interface->mediaPlayer(), SIGNAL(currentSourceChanged(const Phonon::MediaSource &)), SLOT(updateCurrentSong()));
