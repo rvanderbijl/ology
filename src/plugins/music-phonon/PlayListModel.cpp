@@ -42,6 +42,10 @@ QVariant PlayListModel::data( const QModelIndex & index, int role ) const {
             }
         }
     }
+
+    if (role == Qt::UserRole) {
+        return QVariant::fromValue(_playList[index.row()]);
+    }
     // catch-all
     return QVariant();
 }

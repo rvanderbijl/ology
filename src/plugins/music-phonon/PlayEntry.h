@@ -2,6 +2,7 @@
 #define OLOGY_PLAY_ENTRY
 
 #include <QUrl>
+#include <QMetaType>
 
 namespace Ology {
 namespace Plugin {
@@ -27,5 +28,5 @@ private:
 
 }}}
 
-
+Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::PlayEntry);
 #endif

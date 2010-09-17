@@ -37,14 +37,14 @@ PseudoPluginInterface::PseudoPluginInterface() :
     
     ADD_ACTION(Core::CloseScreenAction, Qt::Key_Escape);
     ADD_ACTION(Core::QuitAction, QKeySequence("Ctrl+Q"));
-    ADD_ACTION(Core::PageUpAction, Qt::Key_PageUp);
-    ADD_ACTION(Core::PageDownAction, Qt::Key_PageDown);
-    ADD_ACTION(Core::UpAction, Qt::Key_Up);
-    ADD_ACTION(Core::DownAction, Qt::Key_Down);
-    ADD_ACTION(Core::LeftAction, Qt::Key_Left);
-    ADD_ACTION(Core::RightAction, Qt::Key_Right);
-    ADD_ACTION(Core::FirstAction, Qt::Key_Home);
-    ADD_ACTION(Core::LastAction, Qt::Key_End);
+    ADD_ACTION(Core::PageUpAction, QKeySequence()); //Qt::Key_PageUp);
+    ADD_ACTION(Core::PageDownAction, QKeySequence()); //Qt::Key_PageDown);
+    ADD_ACTION(Core::UpAction, QKeySequence()); //Qt::Key_Up);
+    ADD_ACTION(Core::DownAction, QKeySequence()); //Qt::Key_Down);
+    ADD_ACTION(Core::LeftAction, QKeySequence()); //Qt::Key_Left);
+    ADD_ACTION(Core::RightAction, QKeySequence()); //Qt::Key_Right);
+    ADD_ACTION(Core::FirstAction, QKeySequence()); //Qt::Key_Home);
+    ADD_ACTION(Core::LastAction, QKeySequence()); //Qt::Key_End);
 }
 
 QStringList PseudoPluginInterface::screenIds() {

@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="currentlyPlayingGroupBox">
      <property name="title">
-      <string>Currently Playing</string>
+      <string>Current Song</string>
      </property>
      <property name="flat">
       <bool>false</bool>
@@ -97,7 +97,7 @@
    <item>
     <widget class="QGroupBox" name="availableSongsGroupBox">
      <property name="title">
-      <string>Available Songs</string>
+      <string>Current Playlist</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>

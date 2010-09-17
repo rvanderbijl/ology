@@ -6,6 +6,7 @@ class QWidget;
 
 namespace Ology {
 class AbstractAction;
+class AbstractScreen;
 namespace Plugin { 
     class Manager; 
     class InfoInterface; 
@@ -24,6 +25,8 @@ public:
     virtual QWidget* screenParent() const = 0;
     virtual void displayScreen(const QString &id) = 0;
     virtual void closeCurrentScreen() = 0;
+    virtual AbstractScreen* currentScreen() const = 0;
+
 
     Plugin::InfoInterface* coreInfoInterface() { return _coreInfoInterface; }
     Plugin::ScreenProviderInterface* coreScreenProviderInterface() { return _coreScreenProviderInterface; }

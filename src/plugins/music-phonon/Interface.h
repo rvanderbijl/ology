@@ -47,16 +47,20 @@ public:
     virtual QList<AbstractAction*> globalActions();
 
     Phonon::MediaObject* mediaPlayer() { return _mediaPlayer; }
-    MusicUrl currentSong() const;
+    PlayEntry currentSong() const;
     MusicUrl song(const PlayEntry &entry) const;
     PlayList currentPlayList() { return _currentPlayList; }
 
 // player interface:
 public slots:
     virtual void play();
+    virtual void play(const PlayEntry &entry);
     virtual void stop();
     virtual void next();
     virtual void prev();
+
+signals:
+    void currentSongChanged();
 
 private slots:
     void onFileDetectorThreadReady();

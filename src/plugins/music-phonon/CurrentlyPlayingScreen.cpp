@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QTime>
+#include <QKeyEvent>
 #include <QPushButton>
 #include <Ology/AbstractAction>
 #include <Ology/SimpleAction>
@@ -16,18 +17,17 @@ namespace MusicPhonon {
 
 CurrentlyPlayingScreen::CurrentlyPlayingScreen(Interface *interface, QWidget *parent) :
     AbstractScreen(parent),
-    _interface(interface)
+    _interface(interface),
+    _resetViewTimeout(tr("music-phonon"), tr("reset-view-timeout"), 2*60*1000, metaObject()->className(), "Reset view timeout", "The amount of time to reset the song list to the current  song (in ms)", this)
 {
+    _resetViewTimer.setSingleShot(true);
+    _resetViewTimer.setInterval(_resetViewTimeout.value());
+    connect(&_resetViewTimer, SIGNAL(timeout()), SLOT(resetViewToCurrentSong()));
     hide();
 }
 
 
 bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
-    Q_UNUSED(initPurpose);
-    setupUi(this);
-    updateProgressBar();
-    updateCurrentSong();
-
     SimpleAction *actionSelectSongPrev = new SimpleAction("prev", "Select Previous Song", "", this);
     SimpleAction *actionSelectSongNext = new SimpleAction("next", "Select Next Song", "", this);
     SimpleAction *actionSelectSongPageUp = new SimpleAction("page-up", "Move select a page up", "", this);
@@ -36,6 +36,8 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
     SimpleAction *actionSelectSongLast = new SimpleAction("last", "Select last song", "", this);
 
     if (initPurpose == Ology::RealUsage) {
+        setupUi(this);
+
         connect(OLOGY()->action(Id::Action::Up), SIGNAL(triggered()), actionSelectSongPrev, SLOT(trigger()));
         connect(OLOGY()->action(Id::Action::Down), SIGNAL(triggered()), actionSelectSongNext, SLOT(trigger()));
         connect(OLOGY()->action(Id::Action::PageUp), SIGNAL(triggered()), actionSelectSongPageUp, SLOT(trigger()));
@@ -57,36 +59,79 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSelectSongFirst,    SIGNAL(triggered()), SLOT(onActionSelectSongFirst()));
         connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
 
-        _interface->mediaPlayer()->setTickInterval(200);
+        connect(this->playPausePushButton, SIGNAL(clicked()), _interface, SLOT(play()));
+        connect(this->nextPushButton, SIGNAL(clicked()), _interface, SLOT(next()));
+        connect(this->prevPushButton, SIGNAL(clicked()), _interface, SLOT(prev()));
+
         PlayListModel *model = new PlayListModel(_interface->currentPlayList(), _interface, this);
         currentPlayListTreeView->setModel(model);
+        connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), SLOT(onSongActivated(const QModelIndex&)));
+        connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), &_resetViewTimer, SLOT(stop()));
+        connect(currentPlayListTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), SLOT(maybeStartResetViewTimer()));
+
+        _interface->mediaPlayer()->setTickInterval(200);
 
         connect(_interface->mediaPlayer(), SIGNAL(tick(qint64)), SLOT(updateProgressBar()));
         connect(_interface->mediaPlayer(), SIGNAL(totalTimeChanged(qint64)), SLOT(updateProgressBar()));
         connect(_interface->mediaPlayer(), SIGNAL(currentSourceChanged(const Phonon::MediaSource &)), SLOT(updateCurrentSong()));
+        connect(_interface, SIGNAL(currentSongChanged()), SLOT(updateCurrentSong()));
 
-        connect(this->playPausePushButton, SIGNAL(clicked()), _interface, SLOT(play()));
-        connect(this->nextPushButton, SIGNAL(clicked()), _interface, SLOT(next()));
-        connect(this->prevPushButton, SIGNAL(clicked()), _interface, SLOT(prev()));
+        updateProgressBar();
+        updateCurrentSong();
     }
 
     return true;
 }
 
 void CurrentlyPlayingScreen::onActionSelectSongPrev() {
+    qDebug() << "Select previous song";
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier);
+    QApplication::sendEvent(currentPlayListTreeView, event);
 }
 void CurrentlyPlayingScreen::onActionSelectSongNext() {
+    qDebug() << "Select next song";
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier);
+    QApplication::sendEvent(currentPlayListTreeView, event);
 }
 void CurrentlyPlayingScreen::onActionSelectSongPageUp() {
+    qDebug() << "Select song page up";
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
+    QApplication::sendEvent(currentPlayListTreeView, event);
 }
 void CurrentlyPlayingScreen::onActionSelectSongPageDown() {
+    qDebug() << "Select song page down";
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
+    QApplication::sendEvent(currentPlayListTreeView, event);
 }
 void CurrentlyPlayingScreen::onActionSelectSongFirst() {
+    qDebug() << "Select song page first";
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Home, Qt::NoModifier);
+    QApplication::sendEvent(currentPlayListTreeView, event);
 }
 void CurrentlyPlayingScreen::onActionSelectSongLast() {
+    qDebug() << "Select song page last";
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_End, Qt::NoModifier);
+    QApplication::sendEvent(currentPlayListTreeView, event);
 }
 
+void CurrentlyPlayingScreen::maybeStartResetViewTimer() {
+    PlayEntry entry = _interface->currentSong();
+    if (entry.playListIndex() != currentPlayListTreeView->currentIndex().row()) {
+        _resetViewTimer.start();
+    }
+}
 
+void CurrentlyPlayingScreen::resetViewToCurrentSong() {
+    PlayEntry entry = _interface->currentSong();
+    Q_ASSERT(currentPlayListTreeView);
+    Q_ASSERT(currentPlayListTreeView->model());
+    currentPlayListTreeView->setCurrentIndex( currentPlayListTreeView->model()->index(entry.playListIndex(), 0) );
+}
+
+void CurrentlyPlayingScreen::onSongActivated(const QModelIndex& index) {
+    PlayEntry entry = index.data(Qt::UserRole).value<PlayEntry>();
+    _interface->play(entry);
+}
 
 void CurrentlyPlayingScreen::updateProgressBar() {
     const int currentMs = _interface->mediaPlayer()->currentTime();
@@ -105,7 +150,10 @@ void CurrentlyPlayingScreen::updateProgressBar() {
 }
 
 void CurrentlyPlayingScreen::updateCurrentSong() {
-    MusicUrl musicUrl = _interface->currentSong();
+    MusicUrl musicUrl = _interface->song(_interface->currentSong());
+    if (!_resetViewTimer.isActive()) {
+        resetViewToCurrentSong();
+    }
     
     if (musicUrl.isEmpty()) {
         artistLabel->setText(tr("Artist: %1").arg( tr("No song playing") ));

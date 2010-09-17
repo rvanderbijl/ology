@@ -20,6 +20,7 @@ public:
     virtual QWidget* screenParent() const { return const_cast<Window*>(&_window); }
     virtual void displayScreen(const QString &id);
     virtual void closeCurrentScreen();
+    virtual AbstractScreen* currentScreen() const;
    
 private:
     QStack<AbstractScreen*> _screens;

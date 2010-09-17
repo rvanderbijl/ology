@@ -23,7 +23,6 @@ public:
     virtual QModelIndex parent ( const QModelIndex & index ) const;
     virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
 
-
 private:
     Interface *_interface;
     PlayList _playList;

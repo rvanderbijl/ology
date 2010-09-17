@@ -21,6 +21,7 @@ public:
     virtual QWidget* screenParent() const { return const_cast<Window*>(&_window); }
     virtual void displayScreen(const QString &id) { qWarning() << "SettingsEditor trying to display screen:" << id; }
     virtual void closeCurrentScreen() { qWarning() << "SettingsEditor trying to close current screen"; }
+    virtual AbstractScreen* currentScreen() const { qWarning() << "SettingsEditor trying to get current screen!"; return NULL; }
 
     Core::PseudoPluginInterface* pseudoPlugin() { return _pseudoPlugin; }
 

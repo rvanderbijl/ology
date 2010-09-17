@@ -107,9 +107,9 @@ void Interface::onFilesFound(const QList<QUrl>& files) {
 }
 
 
-MusicUrl Interface::currentSong() const { 
-    if (_history.isEmpty()) { return MusicUrl(); }
-    return song(_history.current());
+PlayEntry Interface::currentSong() const { 
+    if (_history.isEmpty()) { return PlayEntry(); }
+    return _history.current();
 }
 MusicUrl Interface::song(const PlayEntry & entry) const {
     return entry.isNull() ? MusicUrl() : _masterMusicList[entry.masterListIndex()];
@@ -123,7 +123,22 @@ void Interface::play() {
         _mediaPlayer->enqueue( Phonon::MediaSource(url) );
     }
     _mediaPlayer->play();
+    emit currentSongChanged(); // just in case
 }
+
+void Interface::play(const PlayEntry &entry) {
+    if (entry.isValid()) {
+        _history.append(entry);
+        const QUrl url = _masterMusicList[entry.masterListIndex()];
+        Phonon::MediaSource source(url);
+        _mediaPlayer->enqueue(source);
+        _mediaPlayer->setCurrentSource(source);
+        _mediaPlayer->play();
+        _mediaPlayer->clearQueue();
+        emit currentSongChanged();
+    }
+}
+
 
 void Interface::stop() {
     _mediaPlayer->stop();
@@ -173,6 +188,7 @@ void Interface::next() {
         _mediaPlayer->setCurrentSource(source);
         _mediaPlayer->play();
         _mediaPlayer->clearQueue();
+        emit currentSongChanged();
     }
 }
 
@@ -212,6 +228,7 @@ void Interface::prev() {
         _mediaPlayer->setCurrentSource(source);
         _mediaPlayer->play();
         _mediaPlayer->clearQueue();
+        emit currentSongChanged();
     }
 }
 

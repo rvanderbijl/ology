@@ -23,8 +23,11 @@ ConfirmQuitScreen::ConfirmQuitScreen(QWidget *parent) :
 bool ConfirmQuitScreen::initialize(Ology::InitializePurpose initPurpose) {
     SimpleScreenAction *quitAction   = new SimpleScreenAction("action-quit", "Quit", "Actually quit Ology", this);
     SimpleScreenAction *cancelAction = new SimpleScreenAction("action-cancel", "Cancel", "Don't quit Ology", this);
-    connect(quitAction, SIGNAL(triggered()), SLOT(quit()));
-    connect(cancelAction, SIGNAL(triggered()), SLOT(cancel()));
+
+    if (initPurpose == RealUsage) {
+        connect(quitAction, SIGNAL(triggered()), SLOT(quit()));
+        connect(cancelAction, SIGNAL(triggered()), SLOT(cancel()));
+    }
 
     return AbstractDialogScreen::initialize(initPurpose);
 }

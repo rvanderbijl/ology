@@ -1,7 +1,9 @@
 #ifndef OLOGY_PLUGIN_MENUS_MENU_SCREEN
 #define OLOGY_PLUGIN_MENUS_MENU_SCREEN
 
+#include <QTimer>
 #include <Ology/AbstractScreen>
+#include <Ology/Setting>
 #include "ui_currentlyplaying.h"
 
 namespace Ology {
@@ -32,8 +34,14 @@ private slots:
     void updateCurrentSong();
     void updateProgressBar();
 
+    void maybeStartResetViewTimer();
+    void resetViewToCurrentSong();
+    void onSongActivated(const QModelIndex&);
+
 private:
     Interface *_interface;
+    QTimer _resetViewTimer;
+    Setting<int> _resetViewTimeout;
 };
 
 

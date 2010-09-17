@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <Ology/ManagerInterface>
+#include <Ology/AbstractScreen>
 #include "CoreIds.h"
 #include "QuitAction.h"
 
@@ -23,8 +24,10 @@ QuitAction::QuitAction(QObject *parent) :
 
 void QuitAction::run() {
     qDebug() << "QuitAction triggered";
-    if (_confirmQuitSetting.value() == ConfirmQuit) {
-        OLOGY()->displayScreen(Id::Screen::ConfirmQuit); 
+    if (_confirmQuitSetting.value() == ConfirmQuit && OLOGY()->currentScreen()) {
+        if (OLOGY()->currentScreen()->id() != Id::Screen::ConfirmQuit) {
+            OLOGY()->displayScreen(Id::Screen::ConfirmQuit); 
+        }
     } else {
         qApp->quit();
     }

@@ -50,13 +50,14 @@ void Manager::displayScreen(const QString &id) {
     AbstractScreen *screen = _pluginManager.createScreen(id);
     if (!screen) {
         // TODO: display warning to user
+        qWarning() << "Cannot find/create screen:" << id;
         return;
     }
 
-    // Screen->initialize call recursively call displayScreen.
+    // Screen->initialize can call recursively call displayScreen.
     if (!screen->initialize(Ology::RealUsage)) {
         // TODO: display warning to user
-        //       or if another screen has been display, be quiet?
+        //       or if another screen has been displayed (because of recursive call), be quiet?
         qWarning() << "Screen failed to initialize:" << screen->id();
         screen->deleteLater();
         return;
@@ -70,6 +71,11 @@ void Manager::displayScreen(const QString &id) {
     // start running this screen
     _screens.push(screen);
     _window.setScreen(screen);
+}
+
+
+AbstractScreen* Manager::currentScreen() const {
+    return _screens.size() ? _screens.top() : NULL;
 }
 
 
