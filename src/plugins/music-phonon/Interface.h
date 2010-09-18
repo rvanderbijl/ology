@@ -56,6 +56,9 @@ private slots:
     void onFileDetectorThreadReady();
     void onFilesFound(const QList<QUrl>& files);
 
+    void playArtist();
+    void playAlbum();
+
 private:
     FileDetector::WorkerThreadController *_fileDetectorController;
     QList<Song> _masterSongList;

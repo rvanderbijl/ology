@@ -35,7 +35,7 @@ QVariant Player::headerData(int section, Qt::Orientation orientation, int role) 
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch(section) {
             case 0: return tr("Artist");
-            case 1: return tr("Albumn");
+            case 1: return tr("Album");
             case 2: return tr("Title");
         }
     }
@@ -70,11 +70,23 @@ QVariant Player::data( const QModelIndex & index, int role ) const {
         }
     }
 
+    if (index.row() == _currentSongIndex) {
+        if (role == Qt::FontRole) {
+            QFont font; // = QAbstractItemModel::data(index, role).value<QFont>();
+            font.setItalic(true);
+            return font;
+        }
+        if (role == Qt::ForegroundRole) {
+            return QBrush(Qt::blue);
+        }
+    }
+
     if (role == Qt::UserRole) {
         return QVariant::fromValue(_playList[index.row()]);
     }
+
     // catch-all
-    return QVariant();
+    return QVariant(); //QAbstractItemModel::data(index, role);
 }
 
 
@@ -99,30 +111,51 @@ void Player::setNoRepeatAll() {
 }
 
 
-void Player::setPlayList(const QList<Song> &playList) {
+void Player::setPlayList(const QList<Song> &playList, const QString & name) {
+    const Song currentSong = this->currentSong();
+
     beginResetModel();
+    _playListName = name;
     _playList = playList;
     _history.clear();
-    _currentSongIndex = 0;
+    _currentSongIndex = _playList.indexOf(currentSong);
     _currentHistoryIndex = 0;
     endResetModel();
-    // TODO: if playing restart
+
+    if (_currentSongIndex == -1) {
+        _currentSongIndex = 0;
+        if (_mediaPlayer->state() == Phonon::PlayingState) {
+            // if current song is not in the new list, and we are playing, stop playing this song and start on the new list
+            stop();
+            _mediaPlayer->clearQueue();
+            play();
+        } else {
+            _mediaPlayer->clearQueue();
+            if (_playList.isEmpty()) { return; }
+            const Song song = _playList[_currentSongIndex];
+            _mediaPlayer->enqueue( Phonon::MediaSource(song) );
+            qDebug() << "Enqueueing" << song << "queue size:" << _mediaPlayer->queue().size();
+        }
+    } else {
+        qDebug() << "Existing song found, at" << _currentSongIndex;
+    }
 }
 
 QModelIndex Player::currentSongIndex() const {
     if (_playList.isEmpty()) { return QModelIndex(); }
-    return index(_currentSongIndex, 0);
+    return index(_currentSongIndex == -1 ? 0 : _currentSongIndex, 0);
     
 }
 Song Player::currentSong() const {
     if (_playList.isEmpty()) { return Song(); }
-    return _playList[_currentSongIndex];
+    return _playList[_currentSongIndex == -1 ? 0 : _currentSongIndex];
 }
 
 // Player
 void Player::play() {
     if (_playList.isEmpty()) { return; }
-    if (_mediaPlayer->queue().isEmpty()) { 
+    if (_mediaPlayer->currentSource().type() == Phonon::MediaSource::Invalid && _mediaPlayer->queue().isEmpty()) { 
+        qDebug() << "Play, song list is empty!";
         next(); 
         const Song song = _playList[_currentSongIndex];
         _mediaPlayer->enqueue( Phonon::MediaSource(song) );
@@ -133,6 +166,7 @@ void Player::play() {
 void Player::play(const QModelIndex &index) {
     if (!index.isValid()) { return; }
 
+    int oldIndex = _currentSongIndex;
     _currentSongIndex = index.row();
     if (_currentHistoryIndex < (_history.size() - 1)) {
         _history.erase(_history.begin() + _currentHistoryIndex + 1, _history.end());
@@ -142,6 +176,8 @@ void Player::play(const QModelIndex &index) {
 
 
     Song song = _playList[_currentSongIndex];
+    emit dataChanged(this->index(oldIndex,0), this->index(oldIndex,columnCount()-1));
+    emit dataChanged(this->index(_currentSongIndex,0), this->index(_currentSongIndex,columnCount()-1));
     emit currentSongChanged(song);
 
     Phonon::MediaSource source(song);
@@ -158,44 +194,54 @@ void Player::stop() {
 void Player::next() {
     if (_playList.isEmpty()) { return; } // no songs
 
-    // Verify there is a next song to goto:
-    // If we've gone into the history, we always have a next song. 
-    // If we're in Repeat-All mode, we always have a next song.
-    // Otherwise we divide the size of the history compared to
-    //    the size of the playlist. If there is a remainder (% operator),
-    //    then there are more songs. Else we've gone through all entries
-    //    in the play-list. 
-    //    (Exception: if no history, we've not started, so there is a next.)
-    // (This works for both shuffle modes because for both modes we can only go through the list once.)
+    // check if there is a next song
     bool hasNext = false;
-    if (_currentHistoryIndex != (_history.size() -1)) { hasNext = true; }
-    else if (_repeatSetting == RepeatAll) { hasNext = true; }
-    else {
-        if (_shuffleSetting == RandomShuffle) {
-            hasNext = (_history.size() < _playList.size());
-        } else {
-            hasNext = (_currentSongIndex < (_playList.size() - 1));
-        }
+    if (_shuffleSetting == RandomShuffle) {
+        if (_repeatSetting == RepeatAll) { hasNext = true; }
+        else if (_currentHistoryIndex != (_history.size() -1)) { hasNext = true; }
+
+        //  TODO: this doesn't really mean we've played each song in the playlist,
+        //        it just means we've played _playList.size() number of songs.
+        //        Make the rand() function better so that we are guaranteed to hit each number before seeing a duplicate?
+        else { hasNext = (_history.size() < _playList.size()); } 
+
+    } else {
+        if (_repeatSetting == RepeatAll) { hasNext = true; }
+        else { hasNext = (_currentSongIndex < (_playList.size() - 1)); }
     }
     if (!hasNext) { return; }
 
 
-    // okay, switch to the next song
+    // okay, figure out which song is next 
     bool fromHistory = false;
     int nextSongIndex = 0;
-    if (_currentHistoryIndex < (_history.size() -1)) { 
-        nextSongIndex = _history[ ++_currentHistoryIndex ];
-        fromHistory = true;
+    if (_shuffleSetting == RandomShuffle) {
+        if (_currentHistoryIndex < (_history.size() - 1)) {
+            nextSongIndex = _history[++_currentHistoryIndex];
+            fromHistory = true;
+        } else {
+            nextSongIndex = (rand() % _playList.size());
+        }
     } else {
-        // next in play list
-        nextSongIndex = (_shuffleSetting == RandomShuffle) ? (rand() % _playList.size()) : ++_currentSongIndex;
+        // next in play list (with wrap if RepeatAll)
+        if ((_currentSongIndex+1) >= _playList.size()) {
+            if (_repeatSetting == RepeatAll) {
+                nextSongIndex = 0;
+            } else {
+                return;
+            }
+        } else {
+            nextSongIndex = _currentSongIndex + 1;
+        }
     }
+
 
     if (nextSongIndex >= _playList.size()) {
         qDebug() << "Invalid (next) song index!";
         return;
     }
 
+    const int oldIndex = _currentSongIndex;
     _currentSongIndex = nextSongIndex;
     if (!fromHistory) {
         _history.append(nextSongIndex);
@@ -208,6 +254,8 @@ void Player::next() {
         return;
     }
 
+    emit dataChanged(index(oldIndex,0), index(oldIndex,columnCount()-1));
+    emit dataChanged(index(_currentSongIndex,0), index(_currentSongIndex,columnCount()-1));
     emit currentSongChanged(nextSong);
 
     // play it(?)
@@ -226,28 +274,30 @@ void Player::prev() {
 
     // can we go to a previous song?
     bool hasPrevious = false;
-    if (_currentHistoryIndex > 0) { hasPrevious = true; }
-    else if (_repeatSetting == RepeatAll) { hasPrevious = true; }
-    else {
-        if (_shuffleSetting == RandomShuffle) {
-            hasPrevious = true;
-        } else {
-            hasPrevious = (_currentSongIndex > 0);
-        }
+    if (_shuffleSetting == RandomShuffle) {
+        if (_repeatSetting == RepeatAll) { hasPrevious = true; }
+        else if (_currentHistoryIndex > 0) { hasPrevious = true; }
+    } else {
+        if (_repeatSetting == RepeatAll) { hasPrevious = true; }
+        else { hasPrevious = (_currentSongIndex > 0); }
     }
     if (!hasPrevious) { return; }
     
 
     // figure out what the previous song is
     int prevSongIndex =  0;
-    if (_currentHistoryIndex > 0) {
-        prevSongIndex = _history[--_currentHistoryIndex];
-    } else {
-        // next in play list
-        if (_shuffleSetting == RandomShuffle) {
-            prevSongIndex = (rand() % _playList.size());
+    if (_shuffleSetting == RandomShuffle) {
+        if (_currentHistoryIndex > 0) {
+            prevSongIndex = _history[--_currentHistoryIndex];
         } else {
+            prevSongIndex = (rand() % _playList.size());
+            _history.prepend(prevSongIndex);
+        }
+    } else {
+        if (_repeatSetting == RepeatAll) {
             prevSongIndex = ((_currentSongIndex == 0) ? _playList.size() : _currentSongIndex) - 1;
+        } else {
+            prevSongIndex = qMax(0, _currentSongIndex - 1);
         }
     }
 
@@ -258,6 +308,7 @@ void Player::prev() {
     }
 
     // okay, switch to this song
+    const int oldIndex = _currentSongIndex;
     _currentSongIndex = prevSongIndex;
     Song prevSong = _playList[ _currentSongIndex ];
     if (prevSong.isEmpty()) {
@@ -265,6 +316,8 @@ void Player::prev() {
         return;
     }
 
+    emit dataChanged(index(oldIndex,0), index(oldIndex,columnCount()-1));
+    emit dataChanged(index(_currentSongIndex,0), index(_currentSongIndex,columnCount()-1));
     emit currentSongChanged(prevSong);
 
     // play it(?)

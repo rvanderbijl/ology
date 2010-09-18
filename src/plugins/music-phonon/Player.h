@@ -46,8 +46,9 @@ signals:
 public:
     QModelIndex currentSongIndex() const;
     Song currentSong() const;
+    QString playListName() const { return _playListName; }
     QList<Song> playList() { return _playList; }
-    void setPlayList(const QList<Song> &playList);
+    void setPlayList(const QList<Song> &playList, const QString & name);
 
 public slots:
     virtual void play();
@@ -71,6 +72,7 @@ private:
     Setting<Shuffle> _shuffleSetting;
     Setting<Repeat> _repeatSetting;
 
+    QString _playListName;
     QList<Song> _playList;
     QList<int> _history;
     int _currentSongIndex;

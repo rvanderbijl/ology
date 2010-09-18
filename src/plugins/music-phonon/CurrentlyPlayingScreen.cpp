@@ -18,7 +18,8 @@ namespace MusicPhonon {
 CurrentlyPlayingScreen::CurrentlyPlayingScreen(Interface *interface, QWidget *parent) :
     AbstractScreen(parent),
     _interface(interface),
-    _resetViewTimeout(tr("music-phonon"), tr("reset-view-timeout"), 2*60*1000, metaObject()->className(), "Reset view timeout", "The amount of time to reset the song list to the current  song (in ms)", this)
+    _resetViewTimeout(tr("music-phonon"), tr("reset-view-timeout"), 90*1000, 
+                      metaObject()->className(), "Reset view timeout", "The amount of time to reset the song list to the current song (in ms)", this)
 {
     _resetViewTimer.setSingleShot(true);
     _resetViewTimer.setInterval(_resetViewTimeout.value());
@@ -60,6 +61,7 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
 
         connect(this->playPausePushButton, SIGNAL(clicked()), _interface->player(), SLOT(play()));
+        connect(this->stopPushButton, SIGNAL(clicked()), _interface->player(), SLOT(stop()));
         connect(this->nextPushButton, SIGNAL(clicked()), _interface->player(), SLOT(next()));
         connect(this->prevPushButton, SIGNAL(clicked()), _interface->player(), SLOT(prev()));
 
@@ -182,7 +184,8 @@ void CurrentlyPlayingScreen::updatePlayListInfo() {
     Setting<Player::Repeat> *repeat = dynamic_cast<Setting<Player::Repeat>*>(_interface->player()->repeatSetting());
     Setting<Player::Shuffle> *shuffle = dynamic_cast<Setting<Player::Shuffle>*>(_interface->player()->shuffleSetting());
 
-    currentPlayListGroupBox->setTitle(tr("Current PlayList: %1 Songs, %2, %3")
+    currentPlayListGroupBox->setTitle(tr("Current PlayList: %1, %2 Songs, %3, %4")
+          .arg(_interface->player()->playListName())
           .arg(_interface->player()->playList().size())
           .arg(repeat->value() == Player::RepeatAll ? tr("Repeat all") : tr("No repeat"))
           .arg(shuffle->value() == Player::RandomShuffle ? tr("Random Shuffle") : tr("In order")));

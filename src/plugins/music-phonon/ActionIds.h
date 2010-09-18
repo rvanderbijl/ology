@@ -19,5 +19,8 @@ const QString MusicPhononSetNoShuffle("music-phonon-set-no-shuffle");
 const QString MusicPhononSetRepeatAll("music-phonon-set-repeat-all");
 const QString MusicPhononSetNoRepeatAll("music-phonon-set-no-repeat-all");
 
+const QString MusicPhononPlayArtist("music-phonon-play-artist");
+const QString MusicPhononPlayAlbum("music-phonon-play-album");
+
 }}}
 #endif

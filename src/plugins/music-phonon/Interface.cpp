@@ -36,6 +36,9 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
     SimpleAction *actionSetRepeatAll     = new SimpleAction(Id::Action::MusicPhononSetRepeatAll, "Set Repeat-All", "Turn on the repeat all option", this);
     SimpleAction *actionSetNoRepeatAll   = new SimpleAction(Id::Action::MusicPhononSetNoRepeatAll, "Set no Repeat-All", "Turn off the repeat all option", this);
 
+    SimpleAction *actionPlayArtist = new SimpleAction(Id::Action::MusicPhononPlayArtist, "Play Artist", "Set the play list to all songs from the current artist", this);
+    SimpleAction *actionPlayAlbum = new SimpleAction(Id::Action::MusicPhononPlayAlbum, "Play Album", "Set the play list to all songs from the current album", this);
+
 
     // TODO: actions: toggle shuffle, set-shuffle-none, set-shuffle-random 
     // TODO: actions: toggle repeat, set-repeat-none, set-repeat-all
@@ -48,6 +51,8 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
         actionPrev->setShortcut(QKeySequence("Ctrl+H"));
         actionToggleShuffle->setShortcut(QKeySequence("1"));
         actionToggleRepeatAll->setShortcut(QKeySequence("2"));
+        actionPlayArtist->setShortcut(QKeySequence("3"));
+        actionPlayAlbum->setShortcut(QKeySequence("4"));
 
         connect(actionPlay, SIGNAL(triggered()), _player, SLOT(play()));
         connect(actionStop, SIGNAL(triggered()), _player, SLOT(stop()));
@@ -60,6 +65,9 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSetNoShuffle, SIGNAL(triggered()), _player, SLOT(setNoShuffle()));
         connect(actionSetRepeatAll, SIGNAL(triggered()), _player, SLOT(setRepeatAll()));
         connect(actionSetNoRepeatAll, SIGNAL(triggered()), _player, SLOT(setNoRepeatAll()));
+
+        connect(actionPlayArtist, SIGNAL(triggered()), this, SLOT(playArtist()));
+        connect(actionPlayAlbum, SIGNAL(triggered()), this, SLOT(playAlbum()));
 
         _fileDetectorController = new FileDetector::WorkerThreadController(this);
         connect(_fileDetectorController, SIGNAL(dispatcherReady()), SLOT(onFileDetectorThreadReady()));
@@ -102,9 +110,48 @@ void Interface::onFilesFound(const QList<QUrl>& files) {
         qDebug() << "file found:" << url;
         _masterSongList.append(url);
     }
-    _player->setPlayList(_masterSongList);
+    _player->setPlayList(_masterSongList, tr("All music"));
 }
 
+void Interface::playArtist() {
+    const Song currentSong = _player->currentSong();
+    if (currentSong.isEmpty()) { return; }
+
+    QList<Song> newList;
+    foreach(const Song &song, _masterSongList) {
+        if (song.artist() == currentSong.artist()) {
+            newList << song;
+        }
+    }
+
+    if (newList.isEmpty()) {
+        qDebug() << "No songs from this artist!";
+        return;
+    }
+
+    _player->setPlayList(newList, tr("Artist: %1").arg(currentSong.artist()));
+}
+
+void Interface::playAlbum() {
+    Song currentSong = _player->currentSong();
+    if (currentSong.isEmpty()) { return; }
+
+    QList<Song> newList;
+    foreach(const Song &song, _masterSongList) {
+        if ((song.artist() == currentSong.artist()) &&
+            (song.album() == currentSong.album())) 
+        {
+            newList << song;
+        }
+    }
+
+    if (newList.isEmpty()) {
+        qDebug() << "No songs from this album!";
+        return;
+    }
+
+    _player->setPlayList(newList, tr("Album: %1").arg(currentSong.album()));
+}
 
 }}}
 
