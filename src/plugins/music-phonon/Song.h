@@ -10,9 +10,9 @@ namespace Plugin {
 namespace MusicPhonon {
 
 
-class MusicUrl : public QUrl {
+class Song : public QUrl {
 public:
-    MusicUrl(const QUrl & url = QUrl()) : QUrl(url), _tagRef(url.toLocalFile().toAscii()) {}
+    Song(const QUrl & url = QUrl()) : QUrl(url), _tagRef(url.toLocalFile().toAscii()) {}
 
     QString album() const { return _tagRef.tag()->album().toCString(); }
     QString artist() const { return _tagRef.tag()->artist().toCString(); }
@@ -25,5 +25,6 @@ private:
 
 }}}
 
+Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Song);
 
 #endif

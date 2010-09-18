@@ -5,7 +5,7 @@ include(../../common.pri)
 QT += phonon
 
 FORMS += currentlyplaying.ui
-SOURCES += Interface.cpp  CurrentlyPlayingScreen.cpp PlayListModel.cpp PlayHistory.cpp  PlayList.cpp
-HEADERS += Interface.h    CurrentlyPlayingScreen.h   PlayListModel.h   PlayHistory.h    PlayList.h   PlayEntry.h PlayBase.h
+SOURCES += Interface.cpp  CurrentlyPlayingScreen.cpp Player.cpp 
+HEADERS += Interface.h    CurrentlyPlayingScreen.h   Player.h   Song.h
 
 LIBS += -lFileDetector -ltag

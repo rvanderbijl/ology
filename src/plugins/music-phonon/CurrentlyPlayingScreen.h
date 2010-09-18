@@ -31,12 +31,13 @@ private slots:
     void onActionSelectSongLast();
 
 
+    void onSongProgressChanged(qint64 progress);
+    void onSongLengthChanged(qint64 length);
     void updateCurrentSong();
-    void updateProgressBar();
+    void updateProgressBarText();
 
     void maybeStartResetViewTimer();
     void resetViewToCurrentSong();
-    void onSongActivated(const QModelIndex&);
 
 private:
     Interface *_interface;

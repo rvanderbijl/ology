@@ -8,8 +8,8 @@
 #include <Ology/ManagerInterface>
 
 #include "Interface.h"
+#include "Player.h"
 #include "CurrentlyPlayingScreen.h"
-#include "PlayListModel.h"
 
 namespace Ology {
 namespace Plugin {
@@ -59,24 +59,20 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSelectSongFirst,    SIGNAL(triggered()), SLOT(onActionSelectSongFirst()));
         connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
 
-        connect(this->playPausePushButton, SIGNAL(clicked()), _interface, SLOT(play()));
-        connect(this->nextPushButton, SIGNAL(clicked()), _interface, SLOT(next()));
-        connect(this->prevPushButton, SIGNAL(clicked()), _interface, SLOT(prev()));
+        connect(this->playPausePushButton, SIGNAL(clicked()), _interface->player(), SLOT(play()));
+        connect(this->nextPushButton, SIGNAL(clicked()), _interface->player(), SLOT(next()));
+        connect(this->prevPushButton, SIGNAL(clicked()), _interface->player(), SLOT(prev()));
 
-        PlayListModel *model = new PlayListModel(_interface->currentPlayList(), _interface, this);
-        currentPlayListTreeView->setModel(model);
-        connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), SLOT(onSongActivated(const QModelIndex&)));
+        currentPlayListTreeView->setModel(_interface->player());
+        connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), _interface->player(), SLOT(play(const QModelIndex&)));
         connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), &_resetViewTimer, SLOT(stop()));
         connect(currentPlayListTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), SLOT(maybeStartResetViewTimer()));
 
-        _interface->mediaPlayer()->setTickInterval(200);
+        connect(_interface->player(), SIGNAL(currentSongChanged(const Ology::Plugin::MusicPhonon::Song &)), SLOT(updateCurrentSong()));
+        connect(_interface->player(), SIGNAL(songProgressChanged(qint64)), SLOT(onSongProgressChanged(qint64)));
+        connect(_interface->player(), SIGNAL(songLengthChanged(qint64)), SLOT(onSongLengthChanged(qint64)));
 
-        connect(_interface->mediaPlayer(), SIGNAL(tick(qint64)), SLOT(updateProgressBar()));
-        connect(_interface->mediaPlayer(), SIGNAL(totalTimeChanged(qint64)), SLOT(updateProgressBar()));
-        connect(_interface->mediaPlayer(), SIGNAL(currentSourceChanged(const Phonon::MediaSource &)), SLOT(updateCurrentSong()));
-        connect(_interface, SIGNAL(currentSongChanged()), SLOT(updateCurrentSong()));
-
-        updateProgressBar();
+        updateProgressBarText();
         updateCurrentSong();
     }
 
@@ -115,54 +111,63 @@ void CurrentlyPlayingScreen::onActionSelectSongLast() {
 }
 
 void CurrentlyPlayingScreen::maybeStartResetViewTimer() {
-    PlayEntry entry = _interface->currentSong();
-    if (entry.playListIndex() != currentPlayListTreeView->currentIndex().row()) {
+    Song song = _interface->player()->currentSong();
+    if (song != currentPlayListTreeView->currentIndex().data(Qt::UserRole).value<Song>()) {
         _resetViewTimer.start();
     }
 }
 
 void CurrentlyPlayingScreen::resetViewToCurrentSong() {
-    PlayEntry entry = _interface->currentSong();
     Q_ASSERT(currentPlayListTreeView);
     Q_ASSERT(currentPlayListTreeView->model());
-    currentPlayListTreeView->setCurrentIndex( currentPlayListTreeView->model()->index(entry.playListIndex(), 0) );
+    currentPlayListTreeView->setCurrentIndex( _interface->player()->currentSongIndex() );
 }
 
-void CurrentlyPlayingScreen::onSongActivated(const QModelIndex& index) {
-    PlayEntry entry = index.data(Qt::UserRole).value<PlayEntry>();
-    _interface->play(entry);
-}
 
-void CurrentlyPlayingScreen::updateProgressBar() {
-    const int currentMs = _interface->mediaPlayer()->currentTime();
-    const int totalMs =_interface->mediaPlayer()->totalTime();
+void CurrentlyPlayingScreen::updateProgressBarText() {
+    Song song = _interface->player()->currentSong();
+    if (song.isEmpty()) { 
+        qDebug() << "No song ... ";
+        songProgressBar->setFormat("");
+        return;
+    }
+
+    const int currentMs = songProgressBar->value();
+    const int totalMs = songProgressBar->maximum();
 
     QTime current(0,0,0,0), total(0,0,0,0);
     current = current.addMSecs(currentMs);
     total = total.addMSecs(totalMs);
-
-    songProgressBar->setValue( currentMs );
-    songProgressBar->setMaximum( totalMs );
 
     // TODO: if the file longer than one hour, display it correctly!
     songProgressBar->setFormat( tr("%p% (%1 of %2)").arg(current.toString("m:ss"))
                                                     .arg(  total.toString("m:ss")) );
 }
 
+void CurrentlyPlayingScreen::onSongProgressChanged(qint64 progress) {
+    songProgressBar->setValue( progress );
+    updateProgressBarText();
+}
+void CurrentlyPlayingScreen::onSongLengthChanged(qint64 length) {
+    songProgressBar->setMaximum( length );
+    updateProgressBarText();
+}
+
+
 void CurrentlyPlayingScreen::updateCurrentSong() {
-    MusicUrl musicUrl = _interface->song(_interface->currentSong());
+    Song song = _interface->player()->currentSong();
     if (!_resetViewTimer.isActive()) {
         resetViewToCurrentSong();
     }
     
-    if (musicUrl.isEmpty()) {
+    if (song.isEmpty()) {
         artistLabel->setText(tr("Artist: %1").arg( tr("No song playing") ));
         titleLabel->setText(tr("Title: %1").arg( tr("No song playing") ));
     } else {
-        const QString artist = musicUrl.artist(); 
-        const QString title = musicUrl.title();
+        const QString artist = song.artist(); 
+        const QString title = song.title();
         artistLabel->setText(tr("Artist: %1").arg(artist.isEmpty() ? tr("Artist tag missing") : artist ));
-        titleLabel->setText(tr("Title: %1").arg(title.isEmpty() ? QFileInfo(musicUrl.toLocalFile()).fileName() : title));
+        titleLabel->setText(tr("Title: %1").arg(title.isEmpty() ? QFileInfo(song.toLocalFile()).fileName() : title));
     }
 }
 

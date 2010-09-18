@@ -10,29 +10,23 @@
 
 #include <FileDetector/WorkerThreadController>
 
-#include <Phonon/MediaObject>
-
-#include "MusicUrl.h"
-#include "PlayHistory.h"
-#include "PlayList.h"
+#include "Song.h"
 
 namespace Ology {
 namespace Plugin {
 namespace MusicPhonon {
 
+class Player;
+
 class Interface : 
     public QObject,
     public Ology::Plugin::InfoInterface,
-    public Ology::Plugin::PlayerInterface,
+    //public Ology::Plugin::PlayerInterface,
     public Ology::Plugin::ScreenProviderInterface
 {
     Q_OBJECT
-    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface Ology::Plugin::PlayerInterface)
+    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface)
 
-public:
-    enum Shuffle { NoShuffle, RandomShuffle };
-    enum Repeat { RepeatNone, RepeatAll };
-    Q_ENUMS(Shuffle Repeat)
 
 public:
     Interface();
@@ -46,45 +40,30 @@ public:
     virtual AbstractScreen* createScreen(const QString &id, QWidget *parent);
     virtual QList<AbstractAction*> globalActions();
 
-    Phonon::MediaObject* mediaPlayer() { return _mediaPlayer; }
-    PlayEntry currentSong() const;
-    MusicUrl song(const PlayEntry &entry) const;
-    PlayList currentPlayList() { return _currentPlayList; }
+    Player* player() const { return _player; }
 
 // player interface:
+/*
 public slots:
     virtual void play();
     virtual void play(const PlayEntry &entry);
     virtual void stop();
     virtual void next();
     virtual void prev();
-
-signals:
-    void currentSongChanged();
+*/
 
 private slots:
     void onFileDetectorThreadReady();
     void onFilesFound(const QList<QUrl>& files);
 
-
-    int getNextSongIndex();
-
 private:
-    Phonon::MediaObject *_mediaPlayer;
     FileDetector::WorkerThreadController *_fileDetectorController;
-
-    Setting<Shuffle> _shuffleSetting;
-    Setting<Repeat> _repeatSetting;
-
-    QList<MusicUrl> _masterMusicList;
-    PlayList _currentPlayList;
-    PlayHistory _history;
+    QList<Song> _masterSongList;
+    Player *_player;
 };
 
 
 }}}
 
-Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Interface::Shuffle);
-Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Interface::Repeat);
 
 #endif

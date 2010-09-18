@@ -1,0 +1,86 @@
+#ifndef OLOGOY_MUSIC_PHONON_PLAYLIST_MODEL
+#define OLOGOY_MUSIC_PHONON_PLAYLIST_MODEL
+
+#include <QAbstractItemModel>
+#include <Phonon/MediaObject>
+
+#include <Ology/Setting>
+#include "Song.h"
+
+namespace Ology {
+namespace Plugin {
+namespace MusicPhonon {
+
+class Interface;
+
+class Player : public QAbstractItemModel {
+    Q_OBJECT
+public:
+    enum Shuffle { NoShuffle, RandomShuffle };
+    enum Repeat { RepeatNone, RepeatAll };
+    Q_ENUMS(Shuffle Repeat)
+
+public:
+    Player(QObject *parent);
+
+    AbstractSetting *shuffleSetting() { return &_shuffleSetting; }
+    AbstractSetting *repeatSetting() { return &_repeatSetting; }
+
+// QAbstractItemModel: so that views can use this to show the currently play list
+public:
+    virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+    virtual QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
+    virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+    virtual QModelIndex parent ( const QModelIndex & index ) const;
+    virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+
+// useful interface
+signals:
+    void startedPlaying();
+    void currentSongChanged(const Ology::Plugin::MusicPhonon::Song &newSong);
+
+    void songProgressChanged(qint64 ms);
+    void songLengthChanged(qint64 ms);
+
+public:
+    QModelIndex currentSongIndex() const;
+    Song currentSong() const;
+    QList<Song> playList() { return _playList; }
+    void setPlayList(const QList<Song> &playList);
+
+public slots:
+    virtual void play();
+    virtual void play(const QModelIndex &index);
+    virtual void stop();
+    virtual void next();
+    virtual void prev();
+
+public slots:
+    void toggleShuffle();
+    void toggleRepeatAll();
+    void setRandomShuffle();
+    void setNoShuffle();
+    void setRepeatAll();
+    void setNoRepeatAll();
+
+private:
+    Interface *_interface;
+
+    Phonon::MediaObject *_mediaPlayer;
+    Setting<Shuffle> _shuffleSetting;
+    Setting<Repeat> _repeatSetting;
+
+    QList<Song> _playList;
+    QList<int> _history;
+    int _currentSongIndex;
+    int _currentHistoryIndex;
+};
+
+
+}}}
+
+Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Player::Shuffle);
+Q_DECLARE_METATYPE(Ology::Plugin::MusicPhonon::Player::Repeat);
+
+#endif
