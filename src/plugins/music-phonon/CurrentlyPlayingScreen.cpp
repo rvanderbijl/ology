@@ -72,6 +72,13 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(_interface->player(), SIGNAL(songProgressChanged(qint64)), SLOT(onSongProgressChanged(qint64)));
         connect(_interface->player(), SIGNAL(songLengthChanged(qint64)), SLOT(onSongLengthChanged(qint64)));
 
+        connect(_interface->player()->repeatSetting(), SIGNAL(valueChanged()), SLOT(updatePlayListInfo()));
+        connect(_interface->player()->shuffleSetting(), SIGNAL(valueChanged()), SLOT(updatePlayListInfo()));
+        connect(_interface->player(), SIGNAL(modelReset()), SLOT(updatePlayListInfo()));
+        connect(_interface->player(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), SLOT(updatePlayListInfo()));
+        connect(_interface->player(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), SLOT(updatePlayListInfo()));
+
+        updatePlayListInfo();
         updateProgressBarText();
         updateCurrentSong();
     }
@@ -171,5 +178,14 @@ void CurrentlyPlayingScreen::updateCurrentSong() {
     }
 }
 
+void CurrentlyPlayingScreen::updatePlayListInfo() {
+    Setting<Player::Repeat> *repeat = dynamic_cast<Setting<Player::Repeat>*>(_interface->player()->repeatSetting());
+    Setting<Player::Shuffle> *shuffle = dynamic_cast<Setting<Player::Shuffle>*>(_interface->player()->shuffleSetting());
+
+    currentPlayListGroupBox->setTitle(tr("Current PlayList: %1 Songs, %2, %3")
+          .arg(_interface->player()->playList().size())
+          .arg(repeat->value() == Player::RepeatAll ? tr("Repeat all") : tr("No repeat"))
+          .arg(shuffle->value() == Player::RandomShuffle ? tr("Random Shuffle") : tr("In order")));
+}
 
 }}}

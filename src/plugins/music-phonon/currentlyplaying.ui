@@ -95,7 +95,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="availableSongsGroupBox">
+    <widget class="QGroupBox" name="currentPlayListGroupBox">
      <property name="title">
       <string>Current Playlist</string>
      </property>

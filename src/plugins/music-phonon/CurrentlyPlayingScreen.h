@@ -35,6 +35,7 @@ private slots:
     void onSongLengthChanged(qint64 length);
     void updateCurrentSong();
     void updateProgressBarText();
+    void updatePlayListInfo();
 
     void maybeStartResetViewTimer();
     void resetViewToCurrentSong();

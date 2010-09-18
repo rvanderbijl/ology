@@ -46,6 +46,8 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
         actionStop->setShortcut(QKeySequence("Ctrl+S"));
         actionNext->setShortcut(QKeySequence("Ctrl+L"));
         actionPrev->setShortcut(QKeySequence("Ctrl+H"));
+        actionToggleShuffle->setShortcut(QKeySequence("1"));
+        actionToggleRepeatAll->setShortcut(QKeySequence("2"));
 
         connect(actionPlay, SIGNAL(triggered()), _player, SLOT(play()));
         connect(actionStop, SIGNAL(triggered()), _player, SLOT(stop()));
