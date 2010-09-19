@@ -22,22 +22,27 @@ Interface::Interface() :
     registerSetting(_player->repeatSetting());
 }
 
+AbstractPlayer* Interface::player() const {
+    return const_cast<Player*>(_player); 
+}
 
 bool Interface::initialize(Ology::InitializePurpose initPurpose) {
-    SimpleAction *actionPlay = new SimpleAction(Id::Action::MusicPhononPlay, "Play", "Continue playing music", this);
-    SimpleAction *actionStop = new SimpleAction(Id::Action::MusicPhononStop, "Stop", "Stop playing music", this);
-    SimpleAction *actionNext = new SimpleAction(Id::Action::MusicPhononNext, "Next song", "Skip to the next song", this);
-    SimpleAction *actionPrev = new SimpleAction(Id::Action::MusicPhononPrev, "Previous song", "Go back to the previous song", this);
+    SimpleAction *actionPlay = new SimpleAction(Id::Action::MusicPhonon::Play, "Play", "Continue playing music", this);
+    SimpleAction *actionStop = new SimpleAction(Id::Action::MusicPhonon::Stop, "Stop", "Stop playing music", this);
+    SimpleAction *actionNext = new SimpleAction(Id::Action::MusicPhonon::Next, "Next song", "Skip to the next song", this);
+    SimpleAction *actionPrev = new SimpleAction(Id::Action::MusicPhonon::Prev, "Previous song", "Go back to the previous song", this);
+    SimpleAction *actionPlayOrPause = new SimpleAction(Id::Action::MusicPhonon::PlayOrPause, "Previous song", "Go back to the previous song", this);
+    SimpleAction *actionPauseOrUnpause = new SimpleAction(Id::Action::MusicPhonon::PlayOrPause, "Previous song", "Go back to the previous song", this);
 
-    SimpleAction *actionToggleShuffle    = new SimpleAction(Id::Action::MusicPhononToggleShuffle, "Toggle Shuffle", "Toggle the random shuffle option", this);
-    SimpleAction *actionToggleRepeatAll  = new SimpleAction(Id::Action::MusicPhononToggleRepeatAll, "Toggle Repeat-All", "Toggle the repeat all option", this);
-    SimpleAction *actionSetRandomShuffle = new SimpleAction(Id::Action::MusicPhononSetRandomShuffle, "Set Random Shuffle", "Turn on random shuffle", this);
-    SimpleAction *actionSetNoShuffle     = new SimpleAction(Id::Action::MusicPhononSetNoShuffle, "Set No Shuffle", "Turn off random shuffle", this);
-    SimpleAction *actionSetRepeatAll     = new SimpleAction(Id::Action::MusicPhononSetRepeatAll, "Set Repeat-All", "Turn on the repeat all option", this);
-    SimpleAction *actionSetNoRepeatAll   = new SimpleAction(Id::Action::MusicPhononSetNoRepeatAll, "Set no Repeat-All", "Turn off the repeat all option", this);
+    SimpleAction *actionToggleShuffle    = new SimpleAction(Id::Action::MusicPhonon::ToggleShuffle, "Toggle Shuffle", "Toggle the random shuffle option", this);
+    SimpleAction *actionToggleRepeatAll  = new SimpleAction(Id::Action::MusicPhonon::ToggleRepeatAll, "Toggle Repeat-All", "Toggle the repeat all option", this);
+    SimpleAction *actionSetRandomShuffle = new SimpleAction(Id::Action::MusicPhonon::SetRandomShuffle, "Set Random Shuffle", "Turn on random shuffle", this);
+    SimpleAction *actionSetNoShuffle     = new SimpleAction(Id::Action::MusicPhonon::SetNoShuffle, "Set No Shuffle", "Turn off random shuffle", this);
+    SimpleAction *actionSetRepeatAll     = new SimpleAction(Id::Action::MusicPhonon::SetRepeatAll, "Set Repeat-All", "Turn on the repeat all option", this);
+    SimpleAction *actionSetNoRepeatAll   = new SimpleAction(Id::Action::MusicPhonon::SetNoRepeatAll, "Set no Repeat-All", "Turn off the repeat all option", this);
 
-    SimpleAction *actionPlayArtist = new SimpleAction(Id::Action::MusicPhononPlayArtist, "Play Artist", "Set the play list to all songs from the current artist", this);
-    SimpleAction *actionPlayAlbum = new SimpleAction(Id::Action::MusicPhononPlayAlbum, "Play Album", "Set the play list to all songs from the current album", this);
+    SimpleAction *actionPlayArtist = new SimpleAction(Id::Action::MusicPhonon::PlayArtist, "Play Artist", "Set the play list to all songs from the current artist", this);
+    SimpleAction *actionPlayAlbum = new SimpleAction(Id::Action::MusicPhonon::PlayAlbum, "Play Album", "Set the play list to all songs from the current album", this);
 
 
     // TODO: actions: toggle shuffle, set-shuffle-none, set-shuffle-random 
@@ -45,10 +50,6 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
 
     // only connect actions if they're going to be used ...
     if (initPurpose == Ology::RealUsage) {
-        actionPlay->setShortcut(QKeySequence("Ctrl+P"));
-        actionStop->setShortcut(QKeySequence("Ctrl+S"));
-        actionNext->setShortcut(QKeySequence("Ctrl+L"));
-        actionPrev->setShortcut(QKeySequence("Ctrl+H"));
         actionToggleShuffle->setShortcut(QKeySequence("1"));
         actionToggleRepeatAll->setShortcut(QKeySequence("2"));
         actionPlayArtist->setShortcut(QKeySequence("3"));
@@ -58,6 +59,8 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionStop, SIGNAL(triggered()), _player, SLOT(stop()));
         connect(actionNext, SIGNAL(triggered()), _player, SLOT(next()));
         connect(actionPrev, SIGNAL(triggered()), _player, SLOT(prev()));
+        connect(actionPlayOrPause, SIGNAL(triggered()), _player, SLOT(playOrPause()));
+        connect(actionPauseOrUnpause, SIGNAL(triggered()), _player, SLOT(pauseOrUnpause()));
 
         connect(actionToggleShuffle, SIGNAL(triggered()), _player, SLOT(toggleShuffle()));
         connect(actionToggleRepeatAll, SIGNAL(triggered()), _player, SLOT(toggleRepeatAll()));

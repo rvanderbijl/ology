@@ -5,7 +5,7 @@
 #include <QUrl>
 #include <Ology/Setting>
 #include <Ology/Plugin/ScreenProviderInterface>
-#include <Ology/Plugin/PlayerInterface>
+#include <Ology/Plugin/PlayerProviderInterface>
 #include <Ology/Plugin/InfoInterface>
 
 #include <FileDetector/WorkerThreadController>
@@ -21,11 +21,11 @@ class Player;
 class Interface : 
     public QObject,
     public Ology::Plugin::InfoInterface,
-    //public Ology::Plugin::PlayerInterface,
+    public Ology::Plugin::PlayerProviderInterface,
     public Ology::Plugin::ScreenProviderInterface
 {
     Q_OBJECT
-    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface)
+    Q_INTERFACES(Ology::Plugin::InfoInterface Ology::Plugin::ScreenProviderInterface Ology::Plugin::PlayerProviderInterface)
 
 
 public:
@@ -40,7 +40,8 @@ public:
     virtual AbstractScreen* createScreen(const QString &id, QWidget *parent);
     virtual QList<AbstractAction*> globalActions();
 
-    Player* player() const { return _player; }
+    virtual Player* realPlayer() const { return _player; }
+    virtual AbstractPlayer* player() const;
 
 // player interface:
 /*
@@ -67,6 +68,5 @@ private:
 
 
 }}}
-
 
 #endif

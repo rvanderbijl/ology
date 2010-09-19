@@ -1,4 +1,5 @@
 #include "ManagerInterface.h"
+#include "AbstractPlayer.h"
 
 #include "Plugin/Manager.h"
 #include "Plugin/InfoInterface.h"
@@ -16,7 +17,10 @@
 namespace Ology {
 
 ManagerInterface::ManagerInterface() :
-    _pseudoPlugin(NULL)
+    _coreInfoInterface(NULL),
+    _coreScreenProviderInterface(NULL),
+    _pseudoPlugin(NULL),
+    _currentPlayer(NULL)
 {
     _pseudoPlugin = new Core::PseudoPluginInterface();
     _coreInfoInterface = qobject_cast<Plugin::InfoInterface*>(_pseudoPlugin);
@@ -42,5 +46,11 @@ AbstractAction* ManagerInterface::action(const QString &id) const {
     return NULL;
 }
 
+void ManagerInterface::setCurrentPlayer(AbstractPlayer *player) {
+    if (_currentPlayer && (_currentPlayer != player)) {
+        _currentPlayer->stop();
+    }
+    _currentPlayer = player; 
+}
 
 }

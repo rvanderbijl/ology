@@ -20,8 +20,8 @@ SOURCES += Core/PseudoPluginInterface.cpp
 HEADERS += Core/QuitAction.h    Core/DisplayScreenAction.h    Core/CloseScreenAction.h
 SOURCES += Core/QuitAction.cpp  Core/DisplayScreenAction.cpp  Core/CloseScreenAction.cpp
 
-HEADERS += Core/MovementActions.h    Core/MoreScreenAction.h
-SOURCES += Core/MovementActions.cpp  Core/MoreScreenAction.cpp
+HEADERS += Core/PlayerActions.h   Core/MovementActions.h    Core/MoreScreenAction.h
+SOURCES += Core/PlayerActions.cpp Core/MovementActions.cpp  Core/MoreScreenAction.cpp
 
 # core screens
 FORMS += Core/AbstractDialogScreen.ui

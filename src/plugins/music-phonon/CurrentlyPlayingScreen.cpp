@@ -31,14 +31,14 @@ CurrentlyPlayingScreen::CurrentlyPlayingScreen(Interface *interface, QWidget *pa
 
 QList<AbstractAction*> CurrentlyPlayingScreen::moreActions() const {
     QList<AbstractAction*> list;
-    list << _interface->action(Id::Action::MusicPhononPlay)
-         << _interface->action(Id::Action::MusicPhononStop)
-         << _interface->action(Id::Action::MusicPhononNext)
-         << _interface->action(Id::Action::MusicPhononPrev)
-         << _interface->action(Id::Action::MusicPhononToggleShuffle)
-         << _interface->action(Id::Action::MusicPhononToggleRepeatAll)
-         << _interface->action(Id::Action::MusicPhononPlayArtist)
-         << _interface->action(Id::Action::MusicPhononPlayAlbum)
+    list << _interface->action(Id::Action::MusicPhonon::Play)
+         << _interface->action(Id::Action::MusicPhonon::Stop)
+         << _interface->action(Id::Action::MusicPhonon::Next)
+         << _interface->action(Id::Action::MusicPhonon::Prev)
+         << _interface->action(Id::Action::MusicPhonon::ToggleShuffle)
+         << _interface->action(Id::Action::MusicPhonon::ToggleRepeatAll)
+         << _interface->action(Id::Action::MusicPhonon::PlayArtist)
+         << _interface->action(Id::Action::MusicPhonon::PlayAlbum)
          ;
     return list;
 }
@@ -75,25 +75,25 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSelectSongFirst,    SIGNAL(triggered()), SLOT(onActionSelectSongFirst()));
         connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
 
-        connect(this->playPausePushButton, SIGNAL(clicked()), _interface->player(), SLOT(play()));
-        connect(this->stopPushButton, SIGNAL(clicked()), _interface->player(), SLOT(stop()));
-        connect(this->nextPushButton, SIGNAL(clicked()), _interface->player(), SLOT(next()));
-        connect(this->prevPushButton, SIGNAL(clicked()), _interface->player(), SLOT(prev()));
+        connect(this->playPausePushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(play()));
+        connect(this->stopPushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(stop()));
+        connect(this->nextPushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(next()));
+        connect(this->prevPushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(prev()));
 
-        currentPlayListTreeView->setModel(_interface->player());
-        connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), _interface->player(), SLOT(play(const QModelIndex&)));
+        currentPlayListTreeView->setModel(_interface->realPlayer());
+        connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), _interface->realPlayer(), SLOT(play(const QModelIndex&)));
         connect(currentPlayListTreeView, SIGNAL(activated(const QModelIndex &)), &_resetViewTimer, SLOT(stop()));
         connect(currentPlayListTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), SLOT(maybeStartResetViewTimer()));
 
-        connect(_interface->player(), SIGNAL(currentSongChanged(const Ology::Plugin::MusicPhonon::Song &)), SLOT(updateCurrentSong()));
-        connect(_interface->player(), SIGNAL(songProgressChanged(qint64)), SLOT(onSongProgressChanged(qint64)));
-        connect(_interface->player(), SIGNAL(songLengthChanged(qint64)), SLOT(onSongLengthChanged(qint64)));
+        connect(_interface->realPlayer(), SIGNAL(currentSongChanged(const Ology::Plugin::MusicPhonon::Song &)), SLOT(updateCurrentSong()));
+        connect(_interface->realPlayer(), SIGNAL(songProgressChanged(qint64)), SLOT(onSongProgressChanged(qint64)));
+        connect(_interface->realPlayer(), SIGNAL(songLengthChanged(qint64)), SLOT(onSongLengthChanged(qint64)));
 
-        connect(_interface->player()->repeatSetting(), SIGNAL(valueChanged()), SLOT(updatePlayListInfo()));
-        connect(_interface->player()->shuffleSetting(), SIGNAL(valueChanged()), SLOT(updatePlayListInfo()));
-        connect(_interface->player(), SIGNAL(modelReset()), SLOT(updatePlayListInfo()));
-        connect(_interface->player(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), SLOT(updatePlayListInfo()));
-        connect(_interface->player(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), SLOT(updatePlayListInfo()));
+        connect(_interface->realPlayer()->repeatSetting(), SIGNAL(valueChanged()), SLOT(updatePlayListInfo()));
+        connect(_interface->realPlayer()->shuffleSetting(), SIGNAL(valueChanged()), SLOT(updatePlayListInfo()));
+        connect(_interface->realPlayer(), SIGNAL(modelReset()), SLOT(updatePlayListInfo()));
+        connect(_interface->realPlayer(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), SLOT(updatePlayListInfo()));
+        connect(_interface->realPlayer(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), SLOT(updatePlayListInfo()));
 
         updatePlayListInfo();
         updateProgressBarText();
@@ -136,7 +136,7 @@ void CurrentlyPlayingScreen::onActionSelectSongLast() {
 }
 
 void CurrentlyPlayingScreen::maybeStartResetViewTimer() {
-    Song song = _interface->player()->currentSong();
+    Song song = _interface->realPlayer()->currentSong();
     if (song != currentPlayListTreeView->currentIndex().data(Qt::UserRole).value<Song>()) {
         _resetViewTimer.start();
     }
@@ -145,12 +145,12 @@ void CurrentlyPlayingScreen::maybeStartResetViewTimer() {
 void CurrentlyPlayingScreen::resetViewToCurrentSong() {
     Q_ASSERT(currentPlayListTreeView);
     Q_ASSERT(currentPlayListTreeView->model());
-    currentPlayListTreeView->setCurrentIndex( _interface->player()->currentSongIndex() );
+    currentPlayListTreeView->setCurrentIndex( _interface->realPlayer()->currentSongIndex() );
 }
 
 
 void CurrentlyPlayingScreen::updateProgressBarText() {
-    Song song = _interface->player()->currentSong();
+    Song song = _interface->realPlayer()->currentSong();
     if (song.isEmpty()) { 
         qDebug() << "No song ... ";
         songProgressBar->setFormat("");
@@ -180,7 +180,7 @@ void CurrentlyPlayingScreen::onSongLengthChanged(qint64 length) {
 
 
 void CurrentlyPlayingScreen::updateCurrentSong() {
-    Song song = _interface->player()->currentSong();
+    Song song = _interface->realPlayer()->currentSong();
     if (!_resetViewTimer.isActive()) {
         resetViewToCurrentSong();
     }
@@ -199,12 +199,12 @@ void CurrentlyPlayingScreen::updateCurrentSong() {
 }
 
 void CurrentlyPlayingScreen::updatePlayListInfo() {
-    Setting<Player::Repeat> *repeat = dynamic_cast<Setting<Player::Repeat>*>(_interface->player()->repeatSetting());
-    Setting<Player::Shuffle> *shuffle = dynamic_cast<Setting<Player::Shuffle>*>(_interface->player()->shuffleSetting());
+    Setting<Player::Repeat> *repeat = dynamic_cast<Setting<Player::Repeat>*>(_interface->realPlayer()->repeatSetting());
+    Setting<Player::Shuffle> *shuffle = dynamic_cast<Setting<Player::Shuffle>*>(_interface->realPlayer()->shuffleSetting());
 
     currentPlayListGroupBox->setTitle(tr("Current PlayList: %1, %2 Songs, %3, %4")
-          .arg(_interface->player()->playListName())
-          .arg(_interface->player()->playList().size())
+          .arg(_interface->realPlayer()->playListName())
+          .arg(_interface->realPlayer()->playList().size())
           .arg(repeat->value() == Player::RepeatAll ? tr("Repeat all") : tr("No repeat"))
           .arg(shuffle->value() == Player::RandomShuffle ? tr("Random Shuffle") : tr("In order")));
 }

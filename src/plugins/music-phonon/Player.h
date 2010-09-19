@@ -4,6 +4,7 @@
 #include <QAbstractItemModel>
 #include <Phonon/MediaObject>
 
+#include <Ology/AbstractPlayer>
 #include <Ology/Setting>
 #include "Song.h"
 
@@ -13,7 +14,7 @@ namespace MusicPhonon {
 
 class Interface;
 
-class Player : public QAbstractItemModel {
+class Player : public QAbstractItemModel, public AbstractPlayer {
     Q_OBJECT
 public:
     enum Shuffle { NoShuffle, RandomShuffle };
@@ -50,20 +51,32 @@ public:
     QList<Song> playList() { return _playList; }
     void setPlayList(const QList<Song> &playList, const QString & name);
 
-public slots:
-    virtual void play();
-    virtual void play(const QModelIndex &index);
-    virtual void stop();
-    virtual void next();
-    virtual void prev();
 
+// Actions
 public slots:
+    virtual void play(const QModelIndex &index); 
     void toggleShuffle();
     void toggleRepeatAll();
     void setRandomShuffle();
     void setNoShuffle();
     void setRepeatAll();
     void setNoRepeatAll();
+
+// Player interface:
+public:
+    virtual QString id() const { return "music-phonon-player"; }
+    virtual bool isPlaying();
+    virtual bool isPaused();
+public slots:
+    virtual void play();
+    virtual void pause();
+    virtual void unpause();
+    virtual void stop();
+    virtual void next();
+    virtual void prev();
+
+
+
 
 private:
     Interface *_interface;

@@ -7,6 +7,8 @@ class QWidget;
 namespace Ology {
 class AbstractAction;
 class AbstractScreen;
+class AbstractPlayer;
+
 namespace Plugin { 
     class Manager; 
     class InfoInterface; 
@@ -26,6 +28,8 @@ public:
     virtual void displayScreen(const QString &id) = 0;
     virtual void closeCurrentScreen() = 0;
     virtual AbstractScreen* currentScreen() const = 0;
+    virtual AbstractPlayer* currentPlayer() const { return _currentPlayer; }
+    virtual void setCurrentPlayer(AbstractPlayer *player);
 
 
     Plugin::InfoInterface* coreInfoInterface() { return _coreInfoInterface; }
@@ -38,6 +42,7 @@ protected:
     Plugin::InfoInterface *_coreInfoInterface;
     Plugin::ScreenProviderInterface *_coreScreenProviderInterface;
     Core::PseudoPluginInterface *_pseudoPlugin;
+    AbstractPlayer *_currentPlayer;
 };
 
 }

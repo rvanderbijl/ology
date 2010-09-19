@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <Phonon/AudioOutput>
+#include <Ology/ManagerInterface>
 #include <QFileInfo>
 #include "Player.h"
 
@@ -124,7 +125,7 @@ void Player::setPlayList(const QList<Song> &playList, const QString & name) {
 
     if (_currentSongIndex == -1) {
         _currentSongIndex = 0;
-        if (_mediaPlayer->state() == Phonon::PlayingState) {
+        if (this->isPlaying()) {
             // if current song is not in the new list, and we are playing, stop playing this song and start on the new list
             stop();
             _mediaPlayer->clearQueue();
@@ -152,6 +153,12 @@ Song Player::currentSong() const {
 }
 
 // Player
+bool Player::isPlaying() {
+    return (_mediaPlayer && _mediaPlayer->state() == Phonon::PlayingState);
+}
+bool Player::isPaused() {
+    return (_mediaPlayer && _mediaPlayer->state() == Phonon::PausedState);
+}
 void Player::play() {
     if (_playList.isEmpty()) { return; }
     if (_mediaPlayer->currentSource().type() == Phonon::MediaSource::Invalid && _mediaPlayer->queue().isEmpty()) { 
@@ -159,7 +166,19 @@ void Player::play() {
         const Song song = _playList[_currentSongIndex];
         _mediaPlayer->enqueue( Phonon::MediaSource(song) );
     }
+    OLOGY()->setCurrentPlayer(this);
     _mediaPlayer->play();
+}
+
+void Player::pause() {
+    if (isPlaying()) {
+        _mediaPlayer->pause();
+    }
+}
+void Player::unpause() {
+    if (isPaused()) {
+        _mediaPlayer->play();
+    }
 }
 
 void Player::play(const QModelIndex &index) {
@@ -173,12 +192,12 @@ void Player::play(const QModelIndex &index) {
     _history.append(_currentSongIndex);
     _currentHistoryIndex = _history.size() - 1;
 
-
     Song song = _playList[_currentSongIndex];
     emit dataChanged(this->index(oldIndex,0), this->index(oldIndex,columnCount()-1));
     emit dataChanged(this->index(_currentSongIndex,0), this->index(_currentSongIndex,columnCount()-1));
     emit currentSongChanged(song);
 
+    OLOGY()->setCurrentPlayer(this);
     Phonon::MediaSource source(song);
     _mediaPlayer->enqueue(source);
     _mediaPlayer->setCurrentSource(source);
@@ -258,7 +277,7 @@ void Player::next() {
     emit currentSongChanged(nextSong);
 
     // play it(?)
-    if (_mediaPlayer->state() == Phonon::PlayingState) {
+    if (this->isPlaying()) {
         Phonon::MediaSource source(nextSong);
         _mediaPlayer->enqueue(source);
         _mediaPlayer->setCurrentSource(source);
@@ -320,7 +339,7 @@ void Player::prev() {
     emit currentSongChanged(prevSong);
 
     // play it(?)
-    if (_mediaPlayer->state() == Phonon::PlayingState) {
+    if (this->isPlaying()) {
         Phonon::MediaSource source(prevSong);
         _mediaPlayer->enqueue(source);
         _mediaPlayer->setCurrentSource(source);

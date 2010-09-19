@@ -5,6 +5,7 @@
 #include "Core/QuitAction.h"
 #include "Core/MoreScreenAction.h"
 #include "Core/MovementActions.h"
+#include "Core/PlayerActions.h"
 
 #include "Core/ConfirmQuitScreen.h"
 #include "Core/MoreScreen.h"
@@ -42,6 +43,13 @@ PseudoPluginInterface::PseudoPluginInterface() :
     ADD_ACTION(Core::RightAction, QKeySequence()); //Qt::Key_Right);
     ADD_ACTION(Core::FirstAction, QKeySequence()); //Qt::Key_Home);
     ADD_ACTION(Core::LastAction, QKeySequence()); //Qt::Key_End);
+    
+    ADD_ACTION(Core::PlayAction, QKeySequence());
+    ADD_ACTION(Core::StopAction, QKeySequence());
+    ADD_ACTION(Core::NextAction, Qt::CTRL + Qt::Key_Right);
+    ADD_ACTION(Core::PrevAction, Qt::CTRL + Qt::Key_Left);
+    ADD_ACTION(Core::PlayOrPauseAction, QKeySequence("Ctrl+P"));
+    ADD_ACTION(Core::PauseOrUnpauseAction, QKeySequence());
 }
 
 QStringList PseudoPluginInterface::screenIds() {

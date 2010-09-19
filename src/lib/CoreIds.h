@@ -26,6 +26,8 @@ namespace Action {
     const QString Stop("core-action-stop");
     const QString Next("core-action-next");
     const QString Prev("core-action-prev");
+    const QString PlayOrPause("core-action-play-or-pause");
+    const QString PauseOrUnpause("core-action-pause-or-unpause");
 }
 
 
