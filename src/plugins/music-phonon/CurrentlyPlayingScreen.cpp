@@ -1,3 +1,4 @@
+#include <QTimer>
 #include <QDebug>
 #include <QFileInfo>
 #include <QTime>
@@ -97,6 +98,7 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         updatePlayListInfo();
         updateProgressBarText();
         updateCurrentSong();
+        QTimer::singleShot(0, currentPlayListTreeView, SLOT(setFocus()));
     }
 
     return true;
@@ -188,8 +190,10 @@ void CurrentlyPlayingScreen::updateCurrentSong() {
         titleLabel->setText(tr("Title: %1").arg( tr("No song playing") ));
     } else {
         const QString artist = song.artist(); 
+        const QString album = song.album(); 
         const QString title = song.title();
-        artistLabel->setText(tr("Artist: %1").arg(artist.isEmpty() ? tr("Artist tag missing") : artist ));
+        artistLabel->setText(tr("Artist: %1").arg(artist.isEmpty() ? tr("Artist unknown") : artist ));
+        albumLabel->setText(tr("Album: %1").arg(album.isEmpty() ? tr("Album unknown") : album ));
         titleLabel->setText(tr("Title: %1").arg(title.isEmpty() ? QFileInfo(song.toLocalFile()).fileName() : title));
     }
 }

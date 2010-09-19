@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>667</width>
-    <height>483</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,13 @@
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="albumLabel">
+        <property name="text">
+         <string>Album:</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="artistLabel">
         <property name="text">

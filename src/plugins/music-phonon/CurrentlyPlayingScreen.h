@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <Ology/AbstractScreen>
 #include <Ology/Setting>
-#include "ui_currentlyplaying.h"
+#include "ui_CurrentlyPlayingScreen.h"
 
 namespace Ology {
 namespace Plugin {
