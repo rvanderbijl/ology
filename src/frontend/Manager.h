@@ -28,6 +28,7 @@ private:
     QStack<AbstractScreen*> _screens;
     Plugin::Manager _pluginManager;
     Window _window;
+    bool _pausedPlayerForScreen;
 };
 
 

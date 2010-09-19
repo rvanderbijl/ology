@@ -27,7 +27,7 @@ public:
     Q_PROPERTY(QString name READ name);
     Q_PROPERTY(QString description READ description);
     Q_PROPERTY(QString errorString READ errorString);
-    Q_PROPERTY(Ology::AbstractScreen::SoundUsage musicUsage READ musicUsage)
+    Q_PROPERTY(Ology::AbstractScreen::SoundUsage soundUsage READ soundUsage)
     Q_PROPERTY(Ology::AbstractScreen::InputUsage inputUsage READ inputUsage)
     Q_PROPERTY(Ology::AbstractScreen::ScreenState screenState READ screenState)
     Q_ENUMS(SoundUsage InputUsage ScreenState)
@@ -47,7 +47,7 @@ public:
      * 
      * The default is MergeSound. Override if sound usage is different.
      */
-    virtual SoundUsage musicUsage() const { return MergeSound; }
+    virtual SoundUsage soundUsage() const { return MergeSound; }
 
     /*! Return the InputUsage.
      * 

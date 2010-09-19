@@ -1,8 +1,9 @@
 #include <Ology/Plugin/ScreenProviderInterface>
 #include <Ology/AbstractScreen>
+#include <Ology/AbstractPlayer>
 #include <Ology/Core/CloseScreenAction>
+#include <Ology/CoreIds>
 #include "../lib/Core/PseudoPluginInterface.h"
-#include "../lib/CoreIds.h"
 
 #include <QStringList>
 #include <QDebug>
@@ -12,7 +13,8 @@
 namespace Ology {
 
 Manager::Manager(int &argc, char** argv) :
-    QApplication(argc, argv)
+    QApplication(argc, argv),
+    _pausedPlayerForScreen(false)
 {
     setOrganizationName("ology.org");
     setApplicationName("ology");
@@ -66,6 +68,20 @@ void Manager::displayScreen(const QString &id) {
     // suspend previous screen
     if (_screens.size()) {
         _screens.top()->suspend();
+    }
+
+    // pause playing if screen grabs the sound
+    if (currentPlayer()) {
+        if (currentPlayer()->isPlaying() && screen->soundUsage() == AbstractScreen::GrabSound) {
+            // TODO: disable actions to restart playing?
+            currentPlayer()->pause();
+            _pausedPlayerForScreen = true;
+        } else if (currentPlayer()->isPaused() && screen->soundUsage() != AbstractScreen::GrabSound) {
+            if (_pausedPlayerForScreen == true) {
+                currentPlayer()->unpause();
+                _pausedPlayerForScreen = false;
+            }
+        }
     }
 
     // start running this screen
