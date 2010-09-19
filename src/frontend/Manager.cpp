@@ -35,16 +35,6 @@ Manager::Manager(int &argc, char** argv) :
         }
     }
 
-
-/*
-    QAction *exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcut(tr("Ctrl+Q"));
-    exitAct->setStatusTip(tr("Exit the application"));
-    action->setShortcutContext(Qt::ApplicationShortcut);
-    connect(exitAct, SIGNAL(triggered()), qApp, SLOT(quit()));
-*/
-
-
     _window.show();
 }
 
