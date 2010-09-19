@@ -13,10 +13,6 @@ namespace Core {
 ConfirmQuitScreen::ConfirmQuitScreen(QWidget *parent) :
     AbstractDialogScreen(parent)
 {
-    setAutoFillBackground(true); 
-    QPalette p = palette();
-    p.setColor(QPalette::Window, QColor(0xff, 0x00, 0x00, 0x0f));
-    setPalette(p);
 }
 
 

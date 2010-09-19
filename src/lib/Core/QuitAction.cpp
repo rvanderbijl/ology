@@ -23,12 +23,15 @@ QuitAction::QuitAction(QObject *parent) :
 }
 
 void QuitAction::run() {
-    qDebug() << "QuitAction triggered";
     if (_confirmQuitSetting.value() == ConfirmQuit && OLOGY()->currentScreen()) {
         if (OLOGY()->currentScreen()->id() != Id::Screen::ConfirmQuit) {
+            qDebug() << "QuitAction triggered";
             OLOGY()->displayScreen(Id::Screen::ConfirmQuit); 
+        } else {
+            qDebug() << "QuitAction: already displaying the ConfirmQuit screen";
         }
     } else {
+        qDebug() << "QuitAction triggered";
         qApp->quit();
     }
 }

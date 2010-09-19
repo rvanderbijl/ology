@@ -22,6 +22,8 @@ public:
 
     virtual bool initialize(Ology::InitializePurpose initPurpose);
 
+    virtual QList<AbstractAction*> moreActions() const;
+
 private slots:
     void onActionSelectSongPrev();
     void onActionSelectSongNext();

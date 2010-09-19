@@ -9,6 +9,7 @@ namespace Id {
 namespace Action {
     const QString Quit("core-action-quit");
     const QString CloseScreen("core-action-close-screen");
+    const QString MoreScreen("core-action-show-more-screen");
 
     const QString Up("core-action-up");
     const QString Down("core-action-down");
@@ -30,6 +31,7 @@ namespace Action {
 
 namespace Screen {
     const QString ConfirmQuit("core-screen-confirm-quit");
+    const QString More("core-screen-more");
 }
 
 

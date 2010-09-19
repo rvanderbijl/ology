@@ -18,9 +18,11 @@ public:
     
     virtual Plugin::Manager* pluginManager() const { return const_cast<Plugin::Manager*>(&_pluginManager); }
     virtual QWidget* screenParent() const { return const_cast<Window*>(&_window); }
+    virtual AbstractScreen* currentScreen() const;
+
+public slots:
     virtual void displayScreen(const QString &id);
     virtual void closeCurrentScreen();
-    virtual AbstractScreen* currentScreen() const;
    
 private:
     QStack<AbstractScreen*> _screens;

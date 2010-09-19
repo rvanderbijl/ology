@@ -134,10 +134,10 @@ void Player::setPlayList(const QList<Song> &playList, const QString & name) {
             if (_playList.isEmpty()) { return; }
             const Song song = _playList[_currentSongIndex];
             _mediaPlayer->enqueue( Phonon::MediaSource(song) );
-            qDebug() << "Enqueueing" << song << "queue size:" << _mediaPlayer->queue().size();
+            //qDebug() << "Enqueueing" << song << "queue size:" << _mediaPlayer->queue().size();
         }
     } else {
-        qDebug() << "Existing song found, at" << _currentSongIndex;
+        //qDebug() << "Existing song found, at" << _currentSongIndex;
     }
 }
 
@@ -155,7 +155,6 @@ Song Player::currentSong() const {
 void Player::play() {
     if (_playList.isEmpty()) { return; }
     if (_mediaPlayer->currentSource().type() == Phonon::MediaSource::Invalid && _mediaPlayer->queue().isEmpty()) { 
-        qDebug() << "Play, song list is empty!";
         next(); 
         const Song song = _playList[_currentSongIndex];
         _mediaPlayer->enqueue( Phonon::MediaSource(song) );

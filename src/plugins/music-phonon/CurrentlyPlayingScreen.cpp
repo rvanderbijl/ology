@@ -10,6 +10,7 @@
 #include "Interface.h"
 #include "Player.h"
 #include "CurrentlyPlayingScreen.h"
+#include "ActionIds.h"
 
 namespace Ology {
 namespace Plugin {
@@ -27,6 +28,19 @@ CurrentlyPlayingScreen::CurrentlyPlayingScreen(Interface *interface, QWidget *pa
     hide();
 }
 
+QList<AbstractAction*> CurrentlyPlayingScreen::moreActions() const {
+    QList<AbstractAction*> list;
+    list << _interface->action(Id::Action::MusicPhononPlay)
+         << _interface->action(Id::Action::MusicPhononStop)
+         << _interface->action(Id::Action::MusicPhononNext)
+         << _interface->action(Id::Action::MusicPhononPrev)
+         << _interface->action(Id::Action::MusicPhononToggleShuffle)
+         << _interface->action(Id::Action::MusicPhononToggleRepeatAll)
+         << _interface->action(Id::Action::MusicPhononPlayArtist)
+         << _interface->action(Id::Action::MusicPhononPlayAlbum)
+         ;
+    return list;
+}
 
 bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
     SimpleAction *actionSelectSongPrev = new SimpleAction("prev", "Select Previous Song", "", this);

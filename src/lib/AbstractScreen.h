@@ -59,6 +59,10 @@ public:
      */
     virtual QList<AbstractAction*> actions() const { return _actions; }
 
+    /*! Return the actions to be displayed on the "More" options for this screen.
+     */
+    virtual QList<AbstractAction*> moreActions() const { return actions(); }
+
     /*! Return a unique ID for this screen
      */
     virtual QString id() const = 0;
@@ -74,23 +78,34 @@ public:
     virtual bool initialize(Ology::InitializePurpose purpose) = 0;
 
 public slots:
-    /*! suspend is called when a child-screen is created and displayed.
+    /*! suspend is automatically called when a child-screen is created and displayed.
      *
      * Subclases can pause animations, etc until resume is called. It
      * is not guaranteed that resume() will be called. 
      *
-     * Implementers should call the AbstractScreen::suspend().
+     * Reimplementers should call the AbstractScreen::suspend().
      *
      * \sa run()
      */
     virtual void suspend() { setScreenState(ScreenSuspended); setEnabled(false); }
 
-    /*! run is called when this screen becomes the active screen.
+    /*! run is automatically called when this screen becomes the active screen.
      *
-     * Implementers should call the AbstractScreen::run().
+     * Reimplementers should call the AbstractScreen::run().
+     *
      * \sa suspend()
      */
     virtual void run() { setScreenState(ScreenRunning); setEnabled(true); }
+
+    /*! closeScreen() can be called to close this screen.
+     *
+     * It is not automatically called by the Ology framework. 
+     *
+     * This function will only close the screen if it is the currently displayed screen.
+     *
+     * Reimplementers should call the AbstractScreen::run().
+     */
+    virtual void closeScreen();
 
 protected:
     void setScreenState(ScreenState screenState) { _screenState = screenState; }

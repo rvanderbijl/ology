@@ -13,6 +13,7 @@ public:
     AbstractDialogScreen(QWidget *parent);
     
     virtual bool initialize(Ology::InitializePurpose initPurpose);
+    virtual void run();
 
     virtual QString dialogText() const = 0;
 

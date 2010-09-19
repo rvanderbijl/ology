@@ -37,4 +37,16 @@ bool AbstractDialogScreen::initialize(Ology::InitializePurpose initPurpose) {
 }
 
 
+void AbstractDialogScreen::run() {
+    AbstractScreen::run();
+
+    for(int i = 0; i < _ui.dialogLayout->count(); i++) {
+        QLayoutItem *layoutItem = _ui.dialogLayout->itemAt(i);
+        if (layoutItem && qobject_cast<QPushButton*>(layoutItem->widget())) {
+            layoutItem->widget()->setFocus();
+            break;
+        }
+    }
+}
+
 }}

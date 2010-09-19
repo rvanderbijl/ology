@@ -4,6 +4,8 @@
 #include <Ology/AbstractScreen>
 #include "ui_MenuScreen.h"
 
+class QPushButton;
+
 namespace Ology {
 namespace Plugin {
 namespace Menus {
@@ -19,12 +21,18 @@ public:
     virtual QString name() const { return "Menu " + _screenId; }
     virtual QString description() const { return "Menu screen " + _screenId; }
 
+    virtual void run();
+
     virtual QList<AbstractAction*> actions() const;
     virtual bool initialize(Ology::InitializePurpose initPurpose);
+
+private slots:
+     void setButtonToRestore();
     
 private:
     QString _screenId;
     QList<AbstractAction*> _menuActions;
+    QPushButton *_restoreButton;
 };
 
 
