@@ -1,4 +1,7 @@
 #include <QtPlugin>
+#include <QtConcurrentRun>
+#include <QFutureWatcher>
+
 #include <FileDetector/Search>
 #include <Ology/SimpleAction>
 
@@ -20,6 +23,9 @@ Interface::Interface() :
 {
     registerSetting(_player->shuffleSetting());
     registerSetting(_player->repeatSetting());
+    _resortMasterSongListTimer.setSingleShot(true);
+    _resortMasterSongListTimer.setInterval(100);
+    connect(&_resortMasterSongListTimer, SIGNAL(timeout()), SLOT(resortMasterSongList()));
 }
 
 AbstractPlayer* Interface::player() const {
@@ -69,8 +75,8 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSetRepeatAll, SIGNAL(triggered()), _player, SLOT(setRepeatAll()));
         connect(actionSetNoRepeatAll, SIGNAL(triggered()), _player, SLOT(setNoRepeatAll()));
 
-        connect(actionPlayArtist, SIGNAL(triggered()), this, SLOT(playArtist()));
-        connect(actionPlayAlbum, SIGNAL(triggered()), this, SLOT(playAlbum()));
+        connect(actionPlayArtist, SIGNAL(triggered()), this, SLOT(playCurrentArtist()));
+        connect(actionPlayAlbum, SIGNAL(triggered()), this, SLOT(playCurrentAlbum()));
 
         _fileDetectorController = new FileDetector::WorkerThreadController(this);
         connect(_fileDetectorController, SIGNAL(dispatcherReady()), SLOT(onFileDetectorThreadReady()));
@@ -93,6 +99,63 @@ void Interface::onFileDetectorThreadReady() {
     search->startOneTimeSearch(_fileDetectorController);
 }
 
+void Interface::onFilesFound(const QList<QUrl>& files) {
+    foreach(const QUrl &url, files) {
+        qDebug() << "File found:" << url;
+        _addedList.append(url);
+    }
+
+    _resortMasterSongListTimer.start();
+}
+
+void Interface::resortMasterSongList() {
+    // don't run the sort twice at the same time
+    if (findChildren<QFutureWatcher<void>*>().count()) {
+        _resortMasterSongListTimer.start();
+        return;
+    }
+        
+    qDebug() << "About to sort list";
+    _tempList = _masterSongList + _addedList;
+    _addedList.clear();
+
+    QFutureWatcher<void> *fw = new QFutureWatcher<void>(this);
+    connect(fw, SIGNAL(finished()), SLOT(masterSongListResorted())); 
+    connect(fw, SIGNAL(finished()), fw, SLOT(deleteLater())); 
+    fw->setFuture( QtConcurrent::run(&_tempList, &PlayList::sort) );
+}
+
+void Interface::masterSongListResorted() {
+    qDebug() << "Master song list sorted";
+    _masterSongList = _tempList; // drops the list name
+
+    PlayList list = _player->playList();
+    if (list.isEmpty() || (list.type() == PlayList::Mixed && list.name() == tr("All music"))) {
+        qDebug() << "Updating playlist to new master list of" << _masterSongList.count() << "songs";
+        PlayList newList(_masterSongList);
+        newList.setName(tr("All music"));
+        _player->setPlayList(newList);
+    }
+
+    if (list.type() == PlayList::Artist) {
+        PlayList newList = PlayList(_masterSongList).songsByArtist(list.artist());
+        newList.setType(list.type());
+        newList.setArtist(list.artist());
+        newList.setName(list.name());
+        _player->setPlayList(newList);
+    }
+
+    if (list.type() == PlayList::Album) {
+        PlayList newList = PlayList(_masterSongList).songsInAlbum(list.artist(), list.album());
+        newList.setType(list.type());
+        newList.setArtist(list.artist());
+        newList.setAlbum(list.album());
+        newList.setName(list.name());
+        _player->setPlayList(newList);
+    }
+}
+
+
 QStringList Interface::screenIds() {
     return QStringList() << "music-currently-playing" ;
 }
@@ -108,52 +171,28 @@ QList<AbstractAction*> Interface::globalActions() {
     return findChildren<AbstractAction*>();
 }
 
-void Interface::onFilesFound(const QList<QUrl>& files) {
-    foreach(const QUrl &url, files) {
-        qDebug() << "file found:" << url;
-        _masterSongList.append(url);
-    }
-    _player->setPlayList(_masterSongList, tr("All music"));
-}
-
-void Interface::playArtist() {
+void Interface::playCurrentArtist() {
     const Song currentSong = _player->currentSong();
     if (currentSong.isEmpty()) { return; }
-
-    QList<Song> newList;
-    foreach(const Song &song, _masterSongList) {
-        if (song.artist() == currentSong.artist()) {
-            newList << song;
-        }
-    }
-
-    if (newList.isEmpty()) {
-        qDebug() << "No songs from this artist!";
-        return;
-    }
-
-    _player->setPlayList(newList, tr("Artist: %1").arg(currentSong.artist()));
+    playArtist(currentSong.artist());
 }
 
-void Interface::playAlbum() {
+void Interface::playCurrentAlbum() {
     Song currentSong = _player->currentSong();
     if (currentSong.isEmpty()) { return; }
+    playAlbum(currentSong.artist(), currentSong.album());
+}
 
-    QList<Song> newList;
-    foreach(const Song &song, _masterSongList) {
-        if ((song.artist() == currentSong.artist()) &&
-            (song.album() == currentSong.album())) 
-        {
-            newList << song;
-        }
-    }
+void Interface::playArtist(const QString &artist) {
+    QList<Song> songs;
+    PlayList list = PlayList(_masterSongList).songsByArtist(artist);
+    _player->setPlayList(list);
+}
 
-    if (newList.isEmpty()) {
-        qDebug() << "No songs from this album!";
-        return;
-    }
-
-    _player->setPlayList(newList, tr("Album: %1").arg(currentSong.album()));
+void Interface::playAlbum(const QString &artist, const QString &album) {
+    QList<Song> songs;
+    PlayList list = PlayList(_masterSongList).songsInAlbum(artist, album);
+    _player->setPlayList(list);
 }
 
 }}}

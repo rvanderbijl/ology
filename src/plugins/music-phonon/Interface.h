@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QTimer>
 #include <Ology/Setting>
 #include <Ology/Plugin/ScreenProviderInterface>
 #include <Ology/Plugin/PlayerProviderInterface>
@@ -11,6 +12,7 @@
 #include <FileDetector/WorkerThreadController>
 
 #include "Song.h"
+#include "PlayList.h"
 
 namespace Ology {
 namespace Plugin {
@@ -56,13 +58,20 @@ public slots:
 private slots:
     void onFileDetectorThreadReady();
     void onFilesFound(const QList<QUrl>& files);
+    void resortMasterSongList();
+    void masterSongListResorted();
 
-    void playArtist();
-    void playAlbum();
+    void playCurrentArtist();
+    void playCurrentAlbum();
+
+    void playArtist(const QString &artist);
+    void playAlbum(const QString &artist, const QString &album);
 
 private:
     FileDetector::WorkerThreadController *_fileDetectorController;
-    QList<Song> _masterSongList;
+    PlayList _tempList;
+    QList<Song> _masterSongList, _addedList;
+    QTimer _resortMasterSongListTimer;
     Player *_player;
 };
 

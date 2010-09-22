@@ -6,6 +6,7 @@
 
 #include <Ology/AbstractPlayer>
 #include <Ology/Setting>
+#include "PlayList.h"
 #include "Song.h"
 
 namespace Ology {
@@ -47,9 +48,8 @@ signals:
 public:
     QModelIndex currentSongIndex() const;
     Song currentSong() const;
-    QString playListName() const { return _playListName; }
-    QList<Song> playList() { return _playList; }
-    void setPlayList(const QList<Song> &playList, const QString & name);
+    PlayList playList() { return _playList; }
+    void setPlayList(const PlayList &playList);
 
 
 // Actions
@@ -89,8 +89,7 @@ private:
     Setting<Shuffle> _shuffleSetting;
     Setting<Repeat> _repeatSetting;
 
-    QString _playListName;
-    QList<Song> _playList;
+    PlayList _playList;
     QList<int> _history;
     int _currentSongIndex;
     int _currentHistoryIndex;

@@ -112,11 +112,10 @@ void Player::setNoRepeatAll() {
 }
 
 
-void Player::setPlayList(const QList<Song> &playList, const QString & name) {
+void Player::setPlayList(const PlayList &playList) {
     const Song currentSong = this->currentSong();
 
     beginResetModel();
-    _playListName = name;
     _playList = playList;
     _history.clear();
     _currentSongIndex = _playList.indexOf(currentSong);

@@ -203,7 +203,7 @@ void CurrentlyPlayingScreen::updatePlayListInfo() {
     Setting<Player::Shuffle> *shuffle = dynamic_cast<Setting<Player::Shuffle>*>(_interface->realPlayer()->shuffleSetting());
 
     currentPlayListGroupBox->setTitle(tr("Current PlayList: %1, %2 Songs, %3, %4")
-          .arg(_interface->realPlayer()->playListName())
+          .arg(_interface->realPlayer()->playList().name())
           .arg(_interface->realPlayer()->playList().size())
           .arg(repeat->value() == Player::RepeatAll ? tr("Repeat all") : tr("No repeat"))
           .arg(shuffle->value() == Player::RandomShuffle ? tr("Random Shuffle") : tr("In order")));
