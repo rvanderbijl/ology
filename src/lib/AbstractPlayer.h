@@ -52,6 +52,8 @@ public:
      * The interpretation of this function depends on the player-instance. For example, a music player will move to the next song,
      * while a radio player will move to the next station. A tv player might do nothing, and a dvd player may move to the next chapter.
      * If appropriate, this function might not do anything.
+     *
+     * This should not affect the isPlaying / isPaused status.
      */
     virtual void next() = 0;
 
@@ -60,6 +62,8 @@ public:
      * The interpretation of this function depends on the player-instance. For example, a music player will move to the previous song,
      * while a radio player will move to the previous station. A tv player might do nothing, and a dvd player may move to the previous chapter.
      * If appropriate, this function might not do anything.
+     *
+     * This should not affect the isPlaying / isPaused status.
      */
     virtual void prev() = 0;
 

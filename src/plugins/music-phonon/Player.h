@@ -74,6 +74,10 @@ public slots:
     virtual void stop();
     virtual void next();
     virtual void prev();
+#ifdef Q_MOC_RUN
+    void playOrPause();
+    void pauseOrUnpause();
+#endif
 
 
 

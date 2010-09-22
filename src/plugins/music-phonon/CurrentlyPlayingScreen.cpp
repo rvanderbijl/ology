@@ -75,7 +75,7 @@ bool CurrentlyPlayingScreen::initialize(Ology::InitializePurpose initPurpose) {
         connect(actionSelectSongFirst,    SIGNAL(triggered()), SLOT(onActionSelectSongFirst()));
         connect(actionSelectSongLast,     SIGNAL(triggered()), SLOT(onActionSelectSongLast()));
 
-        connect(this->playPausePushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(play()));
+        connect(this->playPausePushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(playOrPause()));
         connect(this->stopPushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(stop()));
         connect(this->nextPushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(next()));
         connect(this->prevPushButton, SIGNAL(clicked()), _interface->realPlayer(), SLOT(prev()));
