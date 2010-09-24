@@ -276,10 +276,11 @@ void Player::next() {
     emit currentSongChanged(nextSong);
 
     // play it(?)
+    const bool isPlaying = this->isPlaying();
     Phonon::MediaSource source(nextSong);
     _mediaPlayer->setCurrentSource(source);
     _mediaPlayer->clearQueue();
-    if (this->isPlaying()) {
+    if (isPlaying) {
         _mediaPlayer->play();
     }
 }
@@ -337,10 +338,11 @@ void Player::prev() {
     emit currentSongChanged(prevSong);
 
     // play it(?)
+    const bool isPlaying = this->isPlaying();
     Phonon::MediaSource source(prevSong);
     _mediaPlayer->setCurrentSource(source);
     _mediaPlayer->clearQueue();
-    if (this->isPlaying()) {
+    if (isPlaying) {
         _mediaPlayer->play();
     }
 }
