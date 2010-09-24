@@ -24,10 +24,12 @@ class WorkDispatcher : public QObject {
     Q_OBJECT
 public:
     WorkDispatcher();
+    ~WorkDispatcher();
 
 public slots:
     void dispatchWork();
     void addSearchWorker(FileDetector::SearchWorker* worker);
+    void moreWorkFound();
 
 private:
     magic_t _magicCookie;

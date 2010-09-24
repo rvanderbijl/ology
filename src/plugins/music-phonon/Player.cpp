@@ -276,12 +276,11 @@ void Player::next() {
     emit currentSongChanged(nextSong);
 
     // play it(?)
+    Phonon::MediaSource source(nextSong);
+    _mediaPlayer->setCurrentSource(source);
+    _mediaPlayer->clearQueue();
     if (this->isPlaying()) {
-        Phonon::MediaSource source(nextSong);
-        _mediaPlayer->enqueue(source);
-        _mediaPlayer->setCurrentSource(source);
         _mediaPlayer->play();
-        _mediaPlayer->clearQueue();
     }
 }
 
@@ -338,12 +337,11 @@ void Player::prev() {
     emit currentSongChanged(prevSong);
 
     // play it(?)
+    Phonon::MediaSource source(prevSong);
+    _mediaPlayer->setCurrentSource(source);
+    _mediaPlayer->clearQueue();
     if (this->isPlaying()) {
-        Phonon::MediaSource source(prevSong);
-        _mediaPlayer->enqueue(source);
-        _mediaPlayer->setCurrentSource(source);
         _mediaPlayer->play();
-        _mediaPlayer->clearQueue();
     }
 }
 

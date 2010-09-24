@@ -4,9 +4,11 @@
 
 namespace FileDetector {
 
-Search::Search(const SearchParameters & parameters, QObject *parent) :
+Search::Search(const SearchParameters & parameters, WorkerThreadController * wtc, QObject *parent) :
     QObject(parent),
-    _parameters(parameters)
+    _parameters(parameters),
+    _threadController(wtc),
+    _worker(NULL)
 {
     // clean up extensions (make sure none start with "." or "*.")
     QList<FileType> temp;
@@ -20,12 +22,11 @@ Search::Search(const SearchParameters & parameters, QObject *parent) :
     _parameters.fileTypes = temp;
 }
 
-Search::Search(const Search* search) :
-    QObject(NULL),
-    _parameters(search->searchParameters())
-{
+Search::~Search() {
+    if (_worker) {
+        stopSearch();
+    }
 }
-
 
 QString Search::errorString(Error code) {
     switch(code) {
@@ -36,12 +37,17 @@ QString Search::errorString(Error code) {
     return tr("Unknown error");
 }
 
-
-void Search::startOneTimeSearch(WorkerThreadController *threadController) {
-    threadController->addSearchWorker(new SearchWorker(this, threadController));
+void Search::startSearch() {
+    _worker = new SearchWorker(this, _threadController);
+    _threadController->addSearchWorker(_worker);
 }
 
-void Search::startContinuousSearch() {
+void Search::stopSearch() {
+    if (_worker) {
+        _threadController->removeSearchWorker(_worker);
+        delete _worker;
+        _worker = NULL;
+    }
 }
 
 

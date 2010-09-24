@@ -18,7 +18,7 @@ public:
     ~WorkerThreadController();
 
     void addSearchWorker(SearchWorker *searchWorker);
-    magic_t magicCookie() { return _magicCookie; }
+    void removeSearchWorker(SearchWorker *searchWorker);
 
 signals:
     void dispatcherReady();
@@ -27,7 +27,6 @@ protected:
     virtual void run();
 
 private:
-    magic_t _magicCookie;
     WorkDispatcher *_dispatcher;
 };
 

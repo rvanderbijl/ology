@@ -19,17 +19,40 @@ WorkDispatcher::WorkDispatcher() :
     connect(&_nullTimer, SIGNAL(timeout()), SLOT(dispatchWork()));
 }
 
+WorkDispatcher::~WorkDispatcher() {
+    magic_close(_magicCookie);
+}
+
 void WorkDispatcher::addSearchWorker(FileDetector::SearchWorker* worker) {
     qDebug("dispatcher added search worker");
+    worker->setParent(this);
+    worker->setMagicCookie(_magicCookie);
+    worker->initialize();
+    connect(worker, SIGNAL(moreWorkFound()), SLOT(moreWorkFound()));
     _jobQueue.append(worker);
     _nullTimer.start();
 }
 
+void WorkDispatcher::moreWorkFound() {
+    SearchWorker *worker = qobject_cast<SearchWorker*>(sender());
+    if (worker) {
+        if (_currentJob == worker || _jobQueue.contains(worker)) {
+            return;
+        }
+        qDebug() << "WorkDispatcher: searchWorker has more work to do";
+        _jobQueue.append(worker);
+        _nullTimer.start();
+    } else {
+        qDebug() << "MoreWorkFound - but for whom? (sender() is not a SearchWorker)";
+    }
+}
 
 void WorkDispatcher::dispatchWork() {
     if (_currentJob) {
         if (_currentJob->work()) {
             _nullTimer.start();
+        } else {
+            _currentJob = NULL;
         }
         return;
     } else {
@@ -40,7 +63,6 @@ void WorkDispatcher::dispatchWork() {
         qDebug("work dispatcher starting new job");
 
         _currentJob = _jobQueue.takeFirst();
-        _currentJob->initialize();
         _nullTimer.start();
     }
 }

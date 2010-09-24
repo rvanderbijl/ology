@@ -58,6 +58,7 @@ public slots:
 private slots:
     void onFileDetectorThreadReady();
     void onFilesFound(const QList<QUrl>& files);
+    void onFilesRemoved(const QList<QUrl>& files);
     void resortMasterSongList();
     void masterSongListResorted();
 

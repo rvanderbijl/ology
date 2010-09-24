@@ -8,6 +8,7 @@
 
 namespace FileDetector {
     class WorkerThreadController;
+    class SearchWorker;
 
 class Search : public QObject {
     Q_OBJECT
@@ -17,31 +18,28 @@ public:
         ErrorAddingSearchToWorkerThread,
     };
 
-    Search(const SearchParameters & parameters, QObject *parent);
+    Search(const SearchParameters & parameters, WorkerThreadController * wtc, QObject *parent);
+    ~Search();
 
     const SearchParameters& searchParameters() const { return _parameters; }
+    WorkerThreadController *threadController() const { return _threadController; }
 
     static QString errorString(Error code);
 
 public slots:
-    void startOneTimeSearch(WorkerThreadController *threadController);
-    void startContinuousSearch();
+    void startSearch();
+    void stopSearch();
 
 signals:
     void searchError(FileDetector::Search::Error error);
-    void oneTimeSearchStarted();
-    void oneTimeSearchCompleted();
-
-    void continuousSearchStarted();
-    void continuousSearchVerified();
-
     void progress(int i, int total);
     void filesAdded(const QList<QUrl> &files);
     void filesRemoved(const QList<QUrl> &files);
 
-protected: // allow search-worker access to it
-    Search(const Search* search);
+private:
     SearchParameters _parameters;
+    WorkerThreadController *_threadController;
+    SearchWorker *_worker;
 };
 
 }

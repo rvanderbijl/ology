@@ -8,7 +8,7 @@ HEADERS += Criteria.h  FileType.h SearchParameters.h
 HEADERS += Search.h
 SOURCES += Search.cpp
 
-HEADERS += WorkerThreadController.h   WorkDispatcher.h   SearchWorker.h
-SOURCES += WorkerThreadController.cpp WorkDispatcher.cpp SearchWorker.cpp
+HEADERS += WorkerThreadController.h   WorkDispatcher.h   SearchWorker.h    INotifyWorker.h
+SOURCES += WorkerThreadController.cpp WorkDispatcher.cpp SearchWorker.cpp  INotifyWorker.cpp
 
 LIBS += -lmagic

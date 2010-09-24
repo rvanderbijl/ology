@@ -94,18 +94,27 @@ void Interface::onFileDetectorThreadReady() {
     p.directory.cd("Music");
     p.searchCriteria = FileDetector::Recursive|FileDetector::IgnoreCase;
 
-    FileDetector::Search *search = new FileDetector::Search(p, this);
+    FileDetector::Search *search = new FileDetector::Search(p, _fileDetectorController, this);
     connect(search, SIGNAL(filesAdded(const QList<QUrl>&)), SLOT(onFilesFound(const QList<QUrl>&)));
-    search->startOneTimeSearch(_fileDetectorController);
+    connect(search, SIGNAL(filesRemoved(const QList<QUrl>&)), SLOT(onFilesRemoved(const QList<QUrl>&)));
+    search->startSearch();
 }
 
 void Interface::onFilesFound(const QList<QUrl>& files) {
     foreach(const QUrl &url, files) {
-        qDebug() << "File found:" << url;
+        qDebug() << "Found song, queuing to add to master song list:" << url;
         _addedList.append(url);
     }
 
     _resortMasterSongListTimer.start();
+}
+
+void Interface::onFilesRemoved(const QList<QUrl>& files) {
+    foreach(const QUrl &url, files) {
+        qDebug() << "Removing file to master song list:" << url;
+        _masterSongList.removeAll(url);
+        // TODO: remove from current play list
+    }
 }
 
 void Interface::resortMasterSongList() {
@@ -115,7 +124,7 @@ void Interface::resortMasterSongList() {
         return;
     }
         
-    qDebug() << "About to sort list";
+    qDebug() << "Preparing to sort new master song list (in a separate thread)";
     _tempList = _masterSongList + _addedList;
     _addedList.clear();
 
@@ -126,7 +135,7 @@ void Interface::resortMasterSongList() {
 }
 
 void Interface::masterSongListResorted() {
-    qDebug() << "Master song list sorted";
+    qDebug() << "Master song list updated and sorted";
     _masterSongList = _tempList; // drops the list name
 
     PlayList list = _player->playList();
@@ -142,7 +151,10 @@ void Interface::masterSongListResorted() {
         newList.setType(list.type());
         newList.setArtist(list.artist());
         newList.setName(list.name());
-        _player->setPlayList(newList);
+        if (newList.size() > _player->playList().size()) {
+            qDebug() << "Updating playlist to include newly found matching songs";
+            _player->setPlayList(newList);
+        }
     }
 
     if (list.type() == PlayList::Album) {
@@ -151,7 +163,10 @@ void Interface::masterSongListResorted() {
         newList.setArtist(list.artist());
         newList.setAlbum(list.album());
         newList.setName(list.name());
-        _player->setPlayList(newList);
+        if (newList.size() > _player->playList().size()) {
+            qDebug() << "Updating playlist to include newly found matching songs";
+            _player->setPlayList(newList);
+        }
     }
 }
 
