@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QUrl>
 #include <QTimer>
+#include <QMutex>
 #include <Ology/Setting>
 #include <Ology/Plugin/ScreenProviderInterface>
 #include <Ology/Plugin/PlayerProviderInterface>
@@ -69,8 +70,12 @@ private slots:
     void playAlbum(const QString &artist, const QString &album);
 
 private:
+    void addSong(const QUrl &url);
+
+private:
     FileDetector::WorkerThreadController *_fileDetectorController;
     PlayList _tempList;
+    QMutex _addedListMutex;
     QList<Song> _masterSongList, _addedList;
     QTimer _resortMasterSongListTimer;
     Player *_player;

@@ -1,4 +1,5 @@
 #include <QtPlugin>
+#include <QMutexLocker>
 #include <QtConcurrentRun>
 #include <QFutureWatcher>
 
@@ -49,6 +50,7 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
 
     SimpleAction *actionPlayArtist = new SimpleAction(Id::Action::MusicPhonon::PlayArtist, "Play Artist", "Set the play list to all songs from the current artist", this);
     SimpleAction *actionPlayAlbum = new SimpleAction(Id::Action::MusicPhonon::PlayAlbum, "Play Album", "Set the play list to all songs from the current album", this);
+    SimpleAction *actionPlayAll = new SimpleAction(Id::Action::MusicPhonon::PlayAll, "Play All", "Set the play list to all songs", this);
 
 
     // TODO: actions: toggle shuffle, set-shuffle-none, set-shuffle-random 
@@ -60,6 +62,7 @@ bool Interface::initialize(Ology::InitializePurpose initPurpose) {
         actionToggleRepeatAll->setShortcut(QKeySequence("2"));
         actionPlayArtist->setShortcut(QKeySequence("3"));
         actionPlayAlbum->setShortcut(QKeySequence("4"));
+        actionPlayAll->setShortcut(QKeySequence("5"));
 
         connect(actionPlay, SIGNAL(triggered()), _player, SLOT(play()));
         connect(actionStop, SIGNAL(triggered()), _player, SLOT(stop()));
@@ -103,9 +106,15 @@ void Interface::onFileDetectorThreadReady() {
 void Interface::onFilesFound(const QList<QUrl>& files) {
     foreach(const QUrl &url, files) {
         qDebug() << "Found song, queuing to add to master song list:" << url;
-        _addedList.append(url);
+        QtConcurrent::run(this, &Interface::addSong, url);
     }
 
+}
+
+
+void Interface::addSong(const QUrl &url) {
+    QMutexLocker locker(&_addedListMutex);
+    _addedList.append(Song(url));
     _resortMasterSongListTimer.start();
 }
 
@@ -124,9 +133,11 @@ void Interface::resortMasterSongList() {
         return;
     }
         
+    QMutexLocker locker(&_addedListMutex);
     qDebug() << "Preparing to sort new master song list (in a separate thread)";
     _tempList = _masterSongList + _addedList;
     _addedList.clear();
+    locker.unlock();
 
     QFutureWatcher<void> *fw = new QFutureWatcher<void>(this);
     connect(fw, SIGNAL(finished()), SLOT(masterSongListResorted())); 

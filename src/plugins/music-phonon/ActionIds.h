@@ -24,6 +24,7 @@ const QString SetNoRepeatAll("music-phonon-set-no-repeat-all");
 
 const QString PlayArtist("music-phonon-play-artist");
 const QString PlayAlbum("music-phonon-play-album");
+const QString PlayAll("music-phonon-play-all");
 
 }}}}
 #endif

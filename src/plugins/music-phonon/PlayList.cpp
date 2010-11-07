@@ -1,3 +1,5 @@
+#include <QThread>
+#include <QCoreApplication>
 #include "PlayList.h"
 #include "Interface.h"
 
@@ -11,6 +13,8 @@ bool artistAlbumTrackLessThan(const Song &s1, const Song &s2) {
     if (s1.album() < s2.album()) { return true; }
     if (s1.album() > s2.album()) { return false; }
     if (s1.track() < s2.track()) { return true; }
+    if (s1.track() > s2.track()) { return false; }
+    if (s1 < s2) { return true; } // url 
     return false;
 }
 
@@ -18,10 +22,13 @@ bool artistTitleLessThan(const Song &s1, const Song &s2) {
     if (s1.artist() < s2.artist()) { return true; }
     if (s1.artist() > s2.artist()) { return false; }
     if (s1.title() < s2.title()) { return true; }
+    if (s1.title() > s2.title()) { return false; }
+    if (s1 < s2) { return true; }
     return false;
 }
 
 void PlayList::sort() {
+    Q_ASSERT(QThread::currentThread() != qApp->thread());
     switch(_type) {
         case Mixed : qSort(this->begin(), this->end(), artistTitleLessThan     ); return;
         case Artist: qSort(this->begin(), this->end(), artistAlbumTrackLessThan); return;

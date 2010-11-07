@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QApplication>
 #include "SearchWorker.h"
 #include "INotifyWorker.h"
 #include "WorkerThreadController.h"
@@ -47,6 +48,7 @@ void SearchWorker::initialize() {
 
 
 bool SearchWorker::work() {
+    Q_ASSERT(QThread::currentThread() != qApp->thread());
     if (_todo.isEmpty()) {
         qDebug("SearchWorker: todo empty");
         emit searchCompleted();

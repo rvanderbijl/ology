@@ -39,6 +39,7 @@ QList<AbstractAction*> CurrentlyPlayingScreen::moreActions() const {
          << _interface->action(Id::Action::MusicPhonon::ToggleRepeatAll)
          << _interface->action(Id::Action::MusicPhonon::PlayArtist)
          << _interface->action(Id::Action::MusicPhonon::PlayAlbum)
+         << _interface->action(Id::Action::MusicPhonon::PlayAll)
          ;
     return list;
 }

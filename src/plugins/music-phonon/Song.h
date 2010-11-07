@@ -23,7 +23,7 @@ public:
             _title = tagRef.tag()->title().toCString();
             _track = tagRef.tag()->track();
         } else {
-            qDebug() << "Unable to read tags from file:" << url;
+            qWarning() << "Unable to read tags from file:" << url;
         }
     }
 

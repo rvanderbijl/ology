@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+#include <QThread>
 #include <QDebug>
 #include <QFile>
 #include <QTimer>
@@ -58,6 +60,8 @@ void INotifyWorker::addFile(const QFileInfo &file) {
 }
 
 void INotifyWorker::readINotify(int fd) {
+    Q_ASSERT(QThread::currentThread() != qApp->thread());
+
     // code adapted from qfileSystemWatcher_inotify:
     if (_reading) {
         qDebug() << "readINotify: recursive call!";
