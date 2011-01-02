@@ -28,7 +28,7 @@ bool artistTitleLessThan(const Song &s1, const Song &s2) {
 }
 
 void PlayList::sort() {
-    Q_ASSERT(QThread::currentThread() != qApp->thread());
+    //Q_ASSERT(QThread::currentThread() != qApp->thread());
     switch(_type) {
         case Mixed : qSort(this->begin(), this->end(), artistTitleLessThan     ); return;
         case Artist: qSort(this->begin(), this->end(), artistAlbumTrackLessThan); return;

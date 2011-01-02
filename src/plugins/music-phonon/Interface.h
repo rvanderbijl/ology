@@ -20,6 +20,7 @@ namespace Plugin {
 namespace MusicPhonon {
 
 class Player;
+class MasterSongListSorter;
 
 class Interface : 
     public QObject,
@@ -74,11 +75,12 @@ private:
 
 private:
     FileDetector::WorkerThreadController *_fileDetectorController;
-    PlayList _tempList;
     QMutex _addedListMutex;
     QList<Song> _masterSongList, _addedList;
     QTimer _resortMasterSongListTimer;
     Player *_player;
+ 
+    MasterSongListSorter *_sorter;
 };
 
 

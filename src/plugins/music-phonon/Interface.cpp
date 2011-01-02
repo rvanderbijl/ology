@@ -20,13 +20,18 @@ using namespace FileDetector;
 
 Interface::Interface() : 
     _fileDetectorController(NULL),
-    _player(new Player(this))
+    _player(new Player(this)),
+    _sorter(NULL)
 {
     registerSetting(_player->shuffleSetting());
     registerSetting(_player->repeatSetting());
     _resortMasterSongListTimer.setSingleShot(true);
     _resortMasterSongListTimer.setInterval(100);
     connect(&_resortMasterSongListTimer, SIGNAL(timeout()), SLOT(resortMasterSongList()));
+
+    PlayList newList(_masterSongList);
+    newList.setName(tr("All music"));
+    _player->setPlayList(newList);
 }
 
 AbstractPlayer* Interface::player() const {
@@ -112,10 +117,18 @@ void Interface::onFilesFound(const QList<QUrl>& files) {
 }
 
 
+// this is called from other threads
 void Interface::addSong(const QUrl &url) {
+    Q_ASSERT(QThread::currentThread() != qApp->thread());
+
     QMutexLocker locker(&_addedListMutex);
     _addedList.append(Song(url));
-    _resortMasterSongListTimer.start();
+
+    // once we have found a hundred songs, allow them to be added to the master list without waiting for more
+    // (thus, only restart the timer to wait for more songs if the size is less than one-hundred)
+    if (_addedList.size() < 100) {
+        Q_ASSERT(QMetaObject::invokeMethod(&_resortMasterSongListTimer, "start", Qt::QueuedConnection));
+    }
 }
 
 void Interface::onFilesRemoved(const QList<QUrl>& files) {
@@ -126,29 +139,60 @@ void Interface::onFilesRemoved(const QList<QUrl>& files) {
     }
 }
 
+
+class MasterSongListSorter : public QRunnable {
+public:
+    MasterSongListSorter(const PlayList &list, Interface *interface) :
+        list(list),
+        _interface(interface)
+    {
+        setAutoDelete(false);
+    }
+
+    virtual void run () {
+        qDebug("SORTING");
+        list.sort();
+        qDebug("DONE SORTING");
+        Q_ASSERT(QMetaObject::invokeMethod(_interface, "masterSongListResorted", Qt::QueuedConnection));
+    }
+
+    PlayList list;
+    Interface *_interface;
+};
+
+
 void Interface::resortMasterSongList() {
+    Q_ASSERT(QThread::currentThread() == qApp->thread());
+
     // don't run the sort twice at the same time
-    if (findChildren<QFutureWatcher<void>*>().count()) {
+    if (_sorter) {
+        qDebug() << "Delaying sort of new master song list (in a separate thread)";
         _resortMasterSongListTimer.start();
         return;
     }
         
-    QMutexLocker locker(&_addedListMutex);
     qDebug() << "Preparing to sort new master song list (in a separate thread)";
-    _tempList = _masterSongList + _addedList;
+    QMutexLocker locker(&_addedListMutex);
+    PlayList list = _masterSongList + _addedList;
     _addedList.clear();
     locker.unlock();
 
-    QFutureWatcher<void> *fw = new QFutureWatcher<void>(this);
-    connect(fw, SIGNAL(finished()), SLOT(masterSongListResorted())); 
-    connect(fw, SIGNAL(finished()), fw, SLOT(deleteLater())); 
-    fw->setFuture( QtConcurrent::run(&_tempList, &PlayList::sort) );
+    _sorter = new MasterSongListSorter(list, this);
+    QThreadPool::globalInstance()->start(_sorter, 100);
 }
 
 void Interface::masterSongListResorted() {
-    qDebug() << "Master song list updated and sorted";
-    _masterSongList = _tempList; // drops the list name
+    if (!_sorter) {
+        qWarning() << "Master song list sorted signal recevied, but no sorter found!";
+        return;
+    }
 
+    qDebug() << "Master song list updated with new sorted list";
+    _masterSongList = _sorter->list;
+    delete _sorter;
+    _sorter = NULL;
+
+    // now update the active play list, as appropriate
     PlayList list = _player->playList();
     if (list.isEmpty() || (list.type() == PlayList::Mixed && list.name() == tr("All music"))) {
         qDebug() << "Updating playlist to new master list of" << _masterSongList.count() << "songs";
@@ -157,7 +201,7 @@ void Interface::masterSongListResorted() {
         _player->setPlayList(newList);
     }
 
-    if (list.type() == PlayList::Artist) {
+    else if (list.type() == PlayList::Artist) {
         PlayList newList = PlayList(_masterSongList).songsByArtist(list.artist());
         newList.setType(list.type());
         newList.setArtist(list.artist());
@@ -168,7 +212,7 @@ void Interface::masterSongListResorted() {
         }
     }
 
-    if (list.type() == PlayList::Album) {
+    else if (list.type() == PlayList::Album) {
         PlayList newList = PlayList(_masterSongList).songsInAlbum(list.artist(), list.album());
         newList.setType(list.type());
         newList.setArtist(list.artist());
@@ -178,6 +222,10 @@ void Interface::masterSongListResorted() {
             qDebug() << "Updating playlist to include newly found matching songs";
             _player->setPlayList(newList);
         }
+    }
+
+    else {
+        qWarning() << "New songs received, but don't know how to update the active playlist!";
     }
 }
 
